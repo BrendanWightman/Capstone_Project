@@ -1,0 +1,3 @@
+graft Telingo/static
+graft Telingo/templates
+global-exclude *.pyc
