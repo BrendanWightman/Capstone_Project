@@ -1,9 +1,11 @@
 import functools
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
-from db import db
+from .database import db, User
 
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from Telingo import database
 
 
 #
@@ -40,7 +42,7 @@ def register():
                 return render_template('register.html', duplicate = True)
 
         if error is None:
-            user = db.User(new_username,new_password,new_language)
+            user = User(new_username,new_password,new_language)
             db.session.add(user)
             db.session.commit()
 

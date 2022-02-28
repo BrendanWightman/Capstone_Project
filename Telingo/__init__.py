@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template
 from . import auth
 from . import home
-from db import db
+from database import db
 
 def create_app(test_config=None):
     # create and configure the app
