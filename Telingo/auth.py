@@ -1,6 +1,7 @@
 import functools
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
+from db import db
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -22,18 +23,26 @@ auth = Blueprint("auth", __name__, url_prefix='/auth')
 @auth.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        new_username = request.form['username']
+        new_password = request.form['password']
+        new_language = request.form['language']
         # Get database
         error = None
 
-        if not username:
+        if not new_username:
             error = 'Username is required.'
-        elif not password:
+        elif not new_password:
             error = 'Password is required.'
+        elif not new_language:
+            error = 'Language is required.'
+
+            if db.session.query(db.exists().where(db.User.username == new_username)).scalar():
+                return render_template('register.html', duplicate = True)
 
         if error is None:
-            pass # Enter the data into the database
+            user = db.User(new_username,new_password,new_language)
+            db.session.add(user)
+            db.session.commit()
 
 
         flash(error)
