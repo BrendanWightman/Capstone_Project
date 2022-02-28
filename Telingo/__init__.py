@@ -3,6 +3,7 @@ import os
 from flask import Flask, render_template
 from . import auth
 from . import home
+from db import db
 
 def create_app(test_config=None):
     # create and configure the app
@@ -15,6 +16,7 @@ def create_app(test_config=None):
     app.secret_key = 'dev'
 
     app.config.from_pyfile('config.py', silent=True)
+    db.init_app(app)
 
     # ensure the instance folder exists
     try:
