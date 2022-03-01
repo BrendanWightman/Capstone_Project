@@ -12,7 +12,7 @@ def landing():
         target = request.form['target'] #will eventually replace with automated match based on preferences
 
         if not username or not target: #Error Check
-            return render_template('message_landing.html') #Add some kind of error message
+            return render_template('messaging/message_landing.html') #Add some kind of error message
         print(username + " is calling " + target)
 
         #Insert code to generate unique connection for WebRTC nonsense
@@ -21,7 +21,7 @@ def landing():
         res = make_response(redirect(url_for('msg.msgChannel')))
         res.set_cookie(key="channel_info", value=username+":"+target)
         return res #Redirect user to their conversation channel
-    return render_template('message_landing.html')
+    return render_template('messaging/message_landing.html')
 
 #Route for actual communication between users
 @msg.route('/channel', methods=('GET', 'POST'))
@@ -31,7 +31,8 @@ def msgChannel():
     if not info:
         #Add error message popup?
         return redirect(url_for('msg.landing'))
-    user, target = info.split(':')
+    user, target = info.split(':') #Once profiles exist load profile information
 
 
-    return render_template('message_channel.html')
+
+    return render_template('messaging/message_channel.html', target=target, user=user)

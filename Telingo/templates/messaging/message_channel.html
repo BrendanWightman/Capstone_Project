@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>P2P Text Chat</title>
+  <meta charset="UTF-8"/>
+  <link href="../static/style.css" rel="stylesheet">
+</head>
+
+<h1>Your Conversation with {{target}}</h1>
+<body>
+  <div class="scrollBox" id="text_chat"></div>
+  <br><br>
+  <div>
+      <label for="message">Message:</label>
+      <input type="text" id="message" name="message">
+      <input type="button" value="Send" onclick="sendMessage();">
+  </div>
+  <script type="text/javascript">
+    // Sends message if user presses 'enter' instead of 'send' button
+    var input = document.getElementById("message");
+    input.addEventListener("keydown", function(e){
+      if (e.key === "Enter"){
+        sendMessage();
+      }
+    })
+
+    function sendMessage(){
+      var message = document.getElementById("message").value;
+      var username = "{{user}}";
+      // Log message Locally
+      document.getElementById("text_chat").innerHTML += username + ": " + message + "<br>";
+
+      // Erase contents of form
+      document.getElementById("message").value="";
+      // Set Scroll to Bottom
+      var chatHistory = document.getElementById("text_chat");
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+  </script>
+</body>
