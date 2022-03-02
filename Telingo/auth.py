@@ -4,7 +4,7 @@ from flask import ( Blueprint, flash, g, redirect,
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from db import database, User
+from .db import database, User
 
 #
 # Any routes that begin with /auth will be sent here 
