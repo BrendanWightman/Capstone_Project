@@ -3,7 +3,7 @@
 <head>
   <title>P2P Text Chat</title>
   <meta charset="UTF-8"/>
-  <link href="../static/style.css" rel="stylesheet">
+  <link href="../../static/style.css" rel="stylesheet">
 </head>
 
 <h1>Your Conversation with {{target}}</h1>
@@ -12,9 +12,13 @@
   <br><br>
   <div>
       <label for="message">Message:</label>
-      <input type="text" id="message" name="message">
-      <input type="button" value="Send" onclick="sendMessage();">
+      <input type="text" id="message" name="message" disabled>
+      <button id="send" onclick="sendMessage();" disabled>Send</button><br><br>
+      <button id="start">Start Call</button>
+      <button id="disconnect" disabled>Disconnect</button>
   </div>
+  <script type="text/javascript" src="../../static/js/adapter.js"></script>
+  <script type="text/javascript" src="../../static/js/messaging.js"></script>
   <script type="text/javascript">
     // Sends message if user presses 'enter' instead of 'send' button
     var input = document.getElementById("message");
@@ -29,7 +33,7 @@
       var username = "{{user}}";
       // Log message Locally
       document.getElementById("text_chat").innerHTML += username + ": " + message + "<br>";
-
+      sendData(message);
       // Erase contents of form
       document.getElementById("message").value="";
       // Set Scroll to Bottom
