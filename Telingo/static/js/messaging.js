@@ -1,5 +1,6 @@
 'use strict';
 
+// Declare Variables
 var localConnection;
 var remoteConnection;
 var sendChannel;
@@ -12,10 +13,12 @@ var startButton = document.querySelector('button#start');
 var sendButton = document.querySelector('button#send');
 var closeButton = document.querySelector('button#disconnect');
 
+// Bind Buttons to functions
 startButton.onclick = createConnection;
-//sendButton.onclick = sendData;
 closeButton.onclick = closeDataChannels;
+  // NOTE: sendMessage function + bind is located in message_channel.html
 
+// Manage button availability
 function enableStartButton() {
   startButton.disabled = false;
 }
@@ -152,7 +155,8 @@ function receiveChannelCallback(event) {
 
 function onReceiveMessageCallback(event) {
   trace('Received Message');
-  dataChannelReceive.value = event.data;
+  displayRecievedMessage(event.data);
+  console.log(event.data);
 }
 
 function onSendChannelStateChange() {

@@ -17,6 +17,14 @@
       <button id="start">Start Call</button>
       <button id="disconnect" disabled>Disconnect</button>
   </div>
+
+<!--Javascript Functionality (ORDER MATTERS)-->
+  <script type="text/javascript">
+    function displayRecievedMessage(message){
+      var username = "{{target}}";
+      document.getElementById("text_chat").innerHTML += username + ": " + message + "<br>";
+    }
+  </script>
   <script type="text/javascript" src="../../static/js/adapter.js"></script>
   <script type="text/javascript" src="../../static/js/messaging.js"></script>
   <script type="text/javascript">
