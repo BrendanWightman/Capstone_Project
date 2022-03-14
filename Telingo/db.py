@@ -1,30 +1,17 @@
-from flask import Flask, app
-from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
 
-#
-#Database Initialization
-#
-db = SQLAlchemy(app)
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Telingo.db'
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
+# The rest of the initilization is in __init__.py
+database = SQLAlchemy()
 
-
-Session(app)
-
-class User(db.Model):
-    username  = db.Column(db.string(200),primary_key = True)
-    password  = db.Column(db.String(200),  nullable = True)
-    language      = db.Column(db.String(200),  nullable = True)
-
-    def __init__(self,username, password,language):
-        self.username = username
-        self.password = password
-        self.language = language
+# I think this needs to stay nullable if I understand it correctly.
+# If not we can change it.
+class User(database.Model):
+    uId  = database.Column(database.Integer, primary_key = True)
+    username  = database.Column(database.String(200), nullable = False)
+    password  = database.Column(database.String(200), nullable = False)
+    #language  = database.Column(database.String(200), nullable = False)
 
  #function to return a string when new data is added
     def __repr__(self):
-        return '<name %r>' % self.id
+        return '<name %r>' % self.uId

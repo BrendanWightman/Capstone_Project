@@ -4,6 +4,7 @@ from flask import ( Blueprint, flash, g, redirect,
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from .db import database, User
 
 #
 # Any routes that begin with /auth will be sent here 
@@ -33,7 +34,14 @@ def register():
             error = 'Password is required.'
 
         if error is None:
-            pass # Enter the data into the database
+            # ToDo:
+                # Still need to check if in the database before adding
+                # add error message
+                # Need to set uId to a new number every time
+                # Add language 
+            user = User(uId=2, username=username, password=password)
+            database.session.add(user)
+            database.session.commit()
 
 
         flash(error)

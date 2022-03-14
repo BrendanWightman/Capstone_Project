@@ -1,0 +1,2 @@
+FLASK_APP=Telingo
+FLASK_ENV=development
