@@ -39,7 +39,7 @@ def register():
                 # add error message
                 # Need to set uId to a new number every time
                 # Add language 
-            user = User(uId=2, username=username, password=password)
+            user = User(uId=2, username=username, password=User.set_password(password))
             database.session.add(user)
             database.session.commit()
 
