@@ -1,6 +1,7 @@
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, make_response
 )
+from flask_socketio import join_room, leave_room, SocketIO
 
 msg = Blueprint("msg", __name__)
 
@@ -26,6 +27,7 @@ def landing():
 #Route for actual communication between users
 @msg.route('/channel', methods=('GET', 'POST'))
 def msgChannel():
+
     #Handle Cookies:
     info = request.cookies.get('channel_info')
     if not info:
@@ -33,6 +35,4 @@ def msgChannel():
         return redirect(url_for('msg.landing'))
     user, target = info.split(':') #Once profiles exist load profile information
 
-
-
-    return render_template('messaging/message_channel.html', target=target, user=user)
+    return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room")

@@ -27,6 +27,20 @@ function disableSendButton() {
   sendButton.disabled = true;
 }
 
+async function makeCall(){
+  const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
+  remoteConnection = new RTCPeerConnection(configuration);
+  //REPLACE WITH CODE FOR SIGNALING//////////////////
+  signalingChannel.addEventListener('message', async message => {
+        if (message.answer) {
+            const remoteDesc = new RTCSessionDescription(message.answer);
+            await peerConnection.setRemoteDescription(remoteDesc);
+        }
+    });
+    ////////////////////////////////////////////
+}
+
+/*
 function createConnection() {
   dataChannelSend.placeholder = '';
   var servers = null;
@@ -64,6 +78,7 @@ function createConnection() {
   startButton.disabled = true;
   closeButton.disabled = false;
 }
+*/
 
 function onCreateSessionDescriptionError(error) {
   trace('Failed to create session description: ' + error.toString());

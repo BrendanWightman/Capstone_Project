@@ -6,14 +6,27 @@
   <link href="../../static/style.css" rel="stylesheet">
 </head>
 
+<!--Establish Socketio connection MOVE TO HEADER????/DRAWN IN FILE????-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('FirstConnect', {info: 'I\'m connected!'});
+        socket.emit('join', {room: '{user_room}'})
+    });
+    socket.on('RJMessage', function(str){
+      console.log(str);
+    });
+</script>
+
 <h1>Your Conversation with {{target}}</h1>
 <body>
   <div class="scrollBox" id="text_chat"></div>
   <br><br>
   <div>
       <label for="message">Message:</label>
-      <input type="text" id="message" name="message" disabled>
-      <button id="send" onclick="sendMessage();" disabled>Send</button><br><br>
+      <input type="text" id="message" name="message" > <!-- Add Disabled -->
+      <button id="send" onclick="sendMessage();">Send</button><br><br> <!-- Add 'disabled'-->
       <button id="start">Start Call</button>
       <button id="disconnect" disabled>Disconnect</button>
   </div>
@@ -24,15 +37,18 @@
       var username = "{{target}}";
       document.getElementById("text_chat").innerHTML += username + ": " + message + "<br>";
     }
+
+
   </script>
-  <script type="text/javascript" src="../../static/js/adapter.js"></script>
-  <script type="text/javascript" src="../../static/js/messaging.js"></script>
+  <!--<script type="text/javascript" src="../../static/js/adapter.js"></script>
+  <script type="text/javascript" src="../../static/js/messaging.js"></script>-->
   <script type="text/javascript">
     // Sends message if user presses 'enter' instead of 'send' button
     var input = document.getElementById("message");
     input.addEventListener("keydown", function(e){
       if (e.key === "Enter"){
-        sendMessage();
+        socket.emit('Message', {msg: document.getElementById("message").value, room: "{user_room}"});
+        //sendMessage();
       }
     })
 
