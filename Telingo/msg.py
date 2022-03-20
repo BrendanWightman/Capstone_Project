@@ -3,7 +3,9 @@ from flask import (
 )
 from flask_socketio import join_room, leave_room, SocketIO
 
+
 msg = Blueprint("msg", __name__)
+
 
 #Route for message landing page
 @msg.route('/msg', methods=('GET', 'POST'))
@@ -35,4 +37,9 @@ def msgChannel():
         return redirect(url_for('msg.landing'))
     user, target = info.split(':') #Once profiles exist load profile information
 
-    return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room")
+    #Bootleg way to determine who starts call
+    if user == "John":
+        temporary_identifier = "false"
+    else:
+        temporary_identifier = "true"
+    return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room", identity=temporary_identifier)

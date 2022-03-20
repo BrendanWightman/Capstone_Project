@@ -18,24 +18,38 @@ def create_app(test_config=None):
 
     app.config.from_pyfile('config.py', silent=True)
     socketio = SocketIO(app)
-    socketio.run(app) #Look into alternative for this
+    socketio.run(app) #Look into alternative for this or w/e
 
-    #SocketIO Messages
+    #SocketIO Listeners
     @socketio.on("FirstConnect")
     def testFunction(data):
         print('recieved: ' + data['info'])
         emit('RJMessage', ("Someone is online"), broadcast=True)
 
+   #Join / Leave room
     @socketio.on("join")
     def joining_room(data):
         room = data['room']
         join_room(room)
-        print('joined room')
+        print('joined room: ' + room)
 
+    @socketio.on('leave')
+    def on_leave(data):
+        room = data['room']
+        leave_room(room)
+        print('leaving room: ' + room)
+
+    #Message Passer (NEED TO UPDATE TO BE NOT-BROADCAST)
     @socketio.on("Message")
+    def send_message(data):
+        print('passing message')
+        emit('Message', data, to=data['room'])
+
+    @socketio.on("TestMessage")
     def testFunction2(data):
         room = data['room']
-        emit("Message", data, to=room)
+        print(data['msg'])
+        emit("RJMessage", (data['msg']), to=room)
 
     # ensure the instance folder exists
     try:

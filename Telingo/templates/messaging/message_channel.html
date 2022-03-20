@@ -8,15 +8,14 @@
 
 <!--Establish Socketio connection MOVE TO HEADER????/DRAWN IN FILE????-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" src="../../static/js/adapter.js"></script>
 <script type="text/javascript" charset="utf-8">
+  // Set up variables based on sent parameters
+    var username = "{{user}}"
+    var target = "{{target}}"
+    var room_ID = "{{user_room}}"
+    var initiator = {{identity}} //True = Initiator, False = Reciever
     var socket = io();
-    socket.on('connect', function() {
-        socket.emit('FirstConnect', {info: 'I\'m connected!'});
-        socket.emit('join', {room: '{user_room}'})
-    });
-    socket.on('RJMessage', function(str){
-      console.log(str);
-    });
 </script>
 
 <h1>Your Conversation with {{target}}</h1>
@@ -25,44 +24,40 @@
   <br><br>
   <div>
       <label for="message">Message:</label>
-      <input type="text" id="message" name="message" > <!-- Add Disabled -->
-      <button id="send" onclick="sendMessage();">Send</button><br><br> <!-- Add 'disabled'-->
-      <button id="start">Start Call</button>
-      <button id="disconnect" disabled>Disconnect</button>
+      <input type="text" id="message" name="message" disabled>
+      <button id="send" onclick="sendMessage();" disabled>Send</button><br><br>
+      <button id="disconnect">Disconnect</button>
   </div>
 
 <!--Javascript Functionality (ORDER MATTERS)-->
+
+<script type="text/javascript" src="../../static/js/messaging.js"></script>
+<script type="text/javascript" charset="utf-8">
+// Socket Listeners
+  socket.on('connect', function() {
+      socket.emit('FirstConnect', {info: 'I\'m connected!'});
+      socket.emit('join', {room: (room_ID)})
+      makeCall();
+  });
+  socket.on('RJMessage', function(str){
+    console.log(str);
+  });
+</script>
+
   <script type="text/javascript">
     function displayRecievedMessage(message){
-      var username = "{{target}}";
-      document.getElementById("text_chat").innerHTML += username + ": " + message + "<br>";
+      document.getElementById("text_chat").innerHTML += target + ": " + message + "<br>";
     }
 
 
   </script>
-  <!--<script type="text/javascript" src="../../static/js/adapter.js"></script>
-  <script type="text/javascript" src="../../static/js/messaging.js"></script>-->
   <script type="text/javascript">
     // Sends message if user presses 'enter' instead of 'send' button
     var input = document.getElementById("message");
     input.addEventListener("keydown", function(e){
       if (e.key === "Enter"){
-        socket.emit('Message', {msg: document.getElementById("message").value, room: "{user_room}"});
-        //sendMessage();
+        sendMessage();
       }
     })
-
-    function sendMessage(){
-      var message = document.getElementById("message").value;
-      var username = "{{user}}";
-      // Log message Locally
-      document.getElementById("text_chat").innerHTML += username + ": " + message + "<br>";
-      sendData(message);
-      // Erase contents of form
-      document.getElementById("message").value="";
-      // Set Scroll to Bottom
-      var chatHistory = document.getElementById("text_chat");
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
   </script>
 </body>
