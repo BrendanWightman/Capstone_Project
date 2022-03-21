@@ -3,8 +3,20 @@
 <head>
   <title>P2P Text Chat</title>
   <meta charset="UTF-8"/>
-  <link href="../static/style.css" rel="stylesheet">
+  <link href="../../static/style.css" rel="stylesheet">
 </head>
+
+<!--Setup (Socketio, adapter, and variables) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" src="../../static/js/adapter.js"></script>
+<script type="text/javascript" charset="utf-8">
+  // Set up variables based on sent parameters
+    var username = "{{user}}"
+    var target = "{{target}}"
+    var room_ID = "{{user_room}}"
+    var initiator = {{identity}} //True = Initiator, False = Reciever
+    var socket = io();
+</script>
 
 <h1>Your Conversation with {{target}}</h1>
 <body>
@@ -12,29 +24,45 @@
   <br><br>
   <div>
       <label for="message">Message:</label>
-      <input type="text" id="message" name="message">
-      <input type="button" value="Send" onclick="sendMessage();">
+      <input type="text" id="message" name="message" disabled>
+      <button id="send" disabled>Send</button><br><br>
+      <button id="disconnect">Disconnect</button>
   </div>
-  <script type="text/javascript">
-    // Sends message if user presses 'enter' instead of 'send' button
-    var input = document.getElementById("message");
-    input.addEventListener("keydown", function(e){
-      if (e.key === "Enter"){
-        sendMessage();
-      }
-    })
 
-    function sendMessage(){
-      var message = document.getElementById("message").value;
-      var username = "{{user}}";
-      // Log message Locally
-      document.getElementById("text_chat").innerHTML += username + ": " + message + "<br>";
 
-      // Erase contents of form
-      document.getElementById("message").value="";
-      // Set Scroll to Bottom
-      var chatHistory = document.getElementById("text_chat");
-      chatHistory.scrollTop = chatHistory.scrollHeight;
+<!--Javascript Functionality (ORDER MATTERS)-->
+<script type="text/javascript" src="../../static/js/messaging.js"></script>
+<script type="text/javascript" charset="utf-8">
+// Socket Listeners (Maybe move into JS file?)
+  socket.on('connect', function() {
+      socket.emit('FirstConnect', {info: 'I\'m connected!'});
+      socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
+       // Change conditions required for this to happen, likely through some kind of join-room event listener
+  });
+
+ // Listeners to ensure connection sequence does not start until both on webpage
+  socket.on('maybeStart', function(){
+    console.log("Maybe Starting");
+    if(connectedCount){
+      console.log("Giving Go-ahead");
+      socket.emit('startCall', {room: (room_ID)});
     }
-  </script>
+    else{
+      connectedCount++;
+    }
+  });
+
+  socket.on('startCall', function(){
+    makeCall();
+  });
+
+// Other listeners:
+ // Sends message if user presses 'enter' instead of 'send' button
+  var input = document.getElementById("message");
+  input.addEventListener("keydown", function(e){
+    if (e.key === "Enter"){
+      sendMessage();
+    }
+  })
+</script>
 </body>
