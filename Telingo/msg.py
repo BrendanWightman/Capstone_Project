@@ -18,13 +18,15 @@ def landing():
             return render_template('messaging/message_landing.html') #Add some kind of error message
         print(username + " is calling " + target)
 
-        #Insert code to generate unique connection for WebRTC nonsense
+        #Insert code to generate unique connection for WebRTC nonsense?
 
         #Cookie to store information about connection
         res = make_response(redirect(url_for('msg.msgChannel')))
         res.set_cookie(key="channel_info", value=username+":"+target)
         return res #Redirect user to their conversation channel
     return render_template('messaging/message_landing.html')
+
+#consider adding between-page to hold users while they wait to be matched
 
 #Route for actual communication between users
 @msg.route('/channel', methods=('GET', 'POST'))

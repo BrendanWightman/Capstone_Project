@@ -4,15 +4,18 @@
 var remoteConnection;
 var sendChannel;
 var receiveChannel;
-const dataChannelSend = document.querySelector('input#message');
-const dataChannelReceive = document.querySelector('div#text_chat');
+var connectedCount = 0;
+// Document Elements
+const messageInput = document.querySelector('input#message');
+const messageDisplay = document.querySelector('div#text_chat');
 const sendButton = document.querySelector('button#send');
 const closeButton = document.querySelector('button#disconnect');
 
 // Bind Buttons to functions
-//closeButton.onclick = closeDataChannels;
-  // NOTE: sendMessage function + bind is located in message_channel.html
+//closeButton.onclick = terminateConnection; <- Needs function implemented first
+sendButton.onclick = sendMessage;
 
+// Signaling-server socket listener:
 socket.on('Message', async function(message){
   if(message.from == username){return}
   console.log("Recieved Message: ", message);
@@ -39,7 +42,7 @@ socket.on('Message', async function(message){
   }
 });
 
-
+// Function to set up connection
 async function makeCall(){
   console.log("Initiating");
   const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
@@ -60,20 +63,19 @@ async function makeCall(){
   console.log("Finished making call");
 }
 
-
+// Event Listener Setup
 function setupListeners(){
-  // Setup for ICE Listening:
-  // Listen for local ICE candidates on the local RTCPeerConnection
+ // Trickle-Ice Candidate Passing:
   remoteConnection.addEventListener('icecandidate', event => {
       if (event.candidate) {
-        console.log("Found a local candidate");
         socket.emit('Message', {'new_ice_candidate': event.candidate, 'room':room_ID, 'from':username});
       }
   });
 
   remoteConnection.addEventListener('connectionstatechange', event => {
       if (remoteConnection.connectionState === 'connected') {
-          console.log("We're connected!");
+        // Insert any code that needs to execute on connection here
+        console.log("We're connected!");
       }
   });
 
@@ -82,15 +84,15 @@ function setupListeners(){
     setupReceiveListeners();
   });
 
-  // Enable textarea and button when opened
+  // Enable textarea and button when channel opened
   sendChannel.addEventListener('open', event => {
-      dataChannelSend.disabled = false;
+      messageInput.disabled = false;
       sendButton.disabled = false;
   });
 
-  // Disable input when closed
+  // Disable input when channel closed
   sendChannel.addEventListener('close', event => {
-      dataChannelSend.disabled = true;
+      messageInput.disabled = true;
       sendButton.disabled = true;
   });
 
@@ -101,17 +103,19 @@ function setupReceiveListeners(){
   receiveChannel.addEventListener('message', event => {
     console.log("Recieved Message");
     var message = event.data;
-    dataChannelReceive.innerHTML += target + ": " + message + "<br>";
+    // Not sure about code injection, but may need to change implementation
+    messageDisplay.innerHTML += target + ": " + message + "<br>";
   });
 }
 
 // Users Passing Messages:
 function sendMessage(){
   console.log("Sending Message");
-  var message = dataChannelSend.value;
+  var message = messageInput.value;
   // Log message Locally + Send
-  dataChannelReceive.innerHTML += username + ": " + message + "<br>";
+  messageDisplay.innerHTML += username + ": " + message + "<br>";
   sendChannel.send(message);
   // QOL Stuff
-  dataChannelReceive.scrollTop = dataChannelReceive.scrollHeight;
+  messageInput.value="";
+  messageDisplay.scrollTop = messageDisplay.scrollHeight;
 }
