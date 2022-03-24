@@ -1,5 +1,6 @@
 from flask import (
-    Blueprint, render_template, request, redirect, url_for, flash, make_response
+    Blueprint, render_template, request, redirect, url_for, flash, make_response,
+    session
 )
 from flask_socketio import join_room, leave_room, SocketIO
 
@@ -13,7 +14,7 @@ def landing():
     if request.method == 'POST':
         username = request.form['username'] #replace with loading user information or w/e
         target = request.form['target'] #will eventually replace with automated match based on preferences
-
+        language = request.form['language']
         if not username or not target: #Error Check
             return render_template('messaging/message_landing.html') #Add some kind of error message
         print(username + " is calling " + target)
@@ -22,7 +23,8 @@ def landing():
 
         #Cookie to store information about connection
         res = make_response(redirect(url_for('msg.msgChannel')))
-        res.set_cookie(key="channel_info", value=username+":"+target)
+        #res.set_cookie(key="channel_info", value=username+":"+target)
+        res.set_cookie(key="channel_info", value=username+":"+target+":"+language)
         return res #Redirect user to their conversation channel
     return render_template('messaging/message_landing.html')
 
@@ -37,11 +39,12 @@ def msgChannel():
     if not info:
         #Add error message popup?
         return redirect(url_for('msg.landing'))
-    user, target = info.split(':') #Once profiles exist load profile information
-
+    #user, target = info.split(':') #Once profiles exist load profile information
+    user, target, language = info.split(':')
     #Bootleg way to determine who starts call
     if user == "John":
         temporary_identifier = "false"
     else:
         temporary_identifier = "true"
-    return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room", identity=temporary_identifier)
+    #return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room", identity=temporary_identifier)
+    return render_template('messaging/message_channel.html', target=target, user=user, user_room=language, identity=temporary_identifier)
