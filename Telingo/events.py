@@ -6,6 +6,7 @@ from . import socketio
 def testFunction(data):
     print('recieved: ' + data['info']) #Can remove / replace with any first-connection function
 
+
 #Functions for Initiating Call
 @socketio.on("joinCallRoom")
 def joiningRoom(data):
