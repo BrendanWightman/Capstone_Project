@@ -7,7 +7,7 @@ var receiveChannel;
 var connectedCount = 0;
 // Document Elements
 const messageInput = document.querySelector('input#message');
-const messageDisplay = document.querySelector('div#text_chat');
+const messageDisplay = document.querySelector('tbody#text_chat');
 const sendButton = document.querySelector('button#send');
 const closeButton = document.querySelector('button#disconnect');
 
@@ -104,7 +104,8 @@ function setupReceiveListeners(){
     console.log("Recieved Message");
     var message = event.data;
     // Not sure about code injection, but may need to change implementation
-    messageDisplay.innerHTML += target + ": " + message + "<br>";
+    messageDisplay.innerHTML += "<tr><td>" + target + ": " + message + "</td></tr>";
+    messageDisplay.scrollTop = messageDisplay.scrollHeight;
   });
 }
 
@@ -112,10 +113,12 @@ function setupReceiveListeners(){
 function sendMessage(){
   console.log("Sending Message");
   var message = messageInput.value;
-  // Log message Locally + Send
-  messageDisplay.innerHTML += username + ": " + message + "<br>";
-  sendChannel.send(message);
-  // QOL Stuff
-  messageInput.value="";
-  messageDisplay.scrollTop = messageDisplay.scrollHeight;
+    if(message != ''){
+    // Log message Locally + Send
+    messageDisplay.innerHTML += "<tr><td>" + username + ": " + message + "</td></tr>";
+    sendChannel.send(message);
+    // QOL Stuff
+    messageInput.value="";
+    messageDisplay.scrollTop = messageDisplay.scrollHeight;
+  }
 }
