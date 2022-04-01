@@ -17,7 +17,7 @@
 
 <h1>Video call</h1>
     <div class="row">
-        <div class="col"><img class="border rounded-0" src="/static/assets/img/WebRTC-740-fi.png" width="500" height="281.25"></div>
+        <div class="col"><video id="remoteVideo" width="500" height="281.25" autoplay playsinline></video></div>
         <div class="col">
             <div class="table-responsive" style="display: block;" >
                 <table class="table table-bordered">
@@ -50,8 +50,6 @@
 // Socket Listeners (Maybe move into JS file?)
   socket.on('connect', function() {
       socket.emit('FirstConnect', {info: 'I\'m connected!'});
-      socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
-       // Change conditions required for this to happen, likely through some kind of join-room event listener
   });
 
  // Listeners to ensure connection sequence does not start until both on webpage

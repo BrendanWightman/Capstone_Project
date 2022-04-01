@@ -2,18 +2,42 @@
 
 // Declare Variables
 var remoteConnection;
-var sendChannel;
-var receiveChannel;
+var sendChannel; // Local text
+var receiveChannel; // Remote text
+var localStream; // Local video + audio
+var remoteStream; // Remote video + audio
 var connectedCount = 0;
 // Document Elements
 const messageInput = document.querySelector('input#message');
 const messageDisplay = document.querySelector('tbody#text_chat');
 const sendButton = document.querySelector('button#send');
 const closeButton = document.querySelector('button#disconnect');
+const remoteVideo = document.querySelector('video#remoteVideo');
 
 // Bind Buttons to functions
 //closeButton.onclick = terminateConnection; <- Needs function implemented first
 sendButton.onclick = sendMessage;
+
+// Media Constraints
+
+const constraints ={
+  'video': {
+    "width": 500,
+    "height": 281.25
+  },
+  'audio': true
+}
+navigator.mediaDevices.getUserMedia(constraints)
+  .then(stream => {
+      console.log('Got MediaStream:', stream);
+      // Once we get the stream, join room for call
+      socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
+  })
+  .catch(error => {
+      //Add troubleshooting here, will require active listening and more code
+      console.error('Error accessing media devices.', error);
+  });
+
 
 // Signaling-server socket listener:
 socket.on('Message', async function(message){
@@ -46,7 +70,12 @@ socket.on('Message', async function(message){
 async function makeCall(){
   console.log("Initiating");
   const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
+  // Set up local streams and channels in advance
+  localStream = await navigator.mediaDevices.getUserMedia(constraints);
   remoteConnection = new RTCPeerConnection(configuration);
+  localStream.getTracks().forEach(track => {
+    remoteConnection.addTrack(track, localStream);
+  });
   sendChannel = remoteConnection.createDataChannel("from_" + username);
   setupListeners();
   if(initiator){
@@ -82,6 +111,11 @@ function setupListeners(){
   remoteConnection.addEventListener('datachannel', event => {
     receiveChannel = event.channel;
     setupReceiveListeners();
+  });
+
+  remoteConnection.addEventListener('track', async (event) => {
+    remoteStream = event.streams;
+    remoteVideo.srcObject = remoteStream[0];
   });
 
   // Enable textarea and button when channel opened
