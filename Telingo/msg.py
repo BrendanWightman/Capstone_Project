@@ -2,7 +2,6 @@ from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, make_response, session
 )
 from flask_socketio import join_room, leave_room, SocketIO
-from .events import socketio
 from .db import *
 
 msg = Blueprint("msg", __name__)
@@ -17,7 +16,7 @@ def landing():
         language = request.form['language']
 
 
-        user = User.query.filter_by(username=session['username']).first()
+        #user = User.query.filter_by(username=session['username']).first()
 
 
         databaseMappings = {
@@ -60,7 +59,8 @@ def landing():
         foundRoom = False
         for room in rooms:
             if(room.proficiency + searchRange == userProf.fluency or room.proficiency - searchRange == userProf.fluency):
-                room.initiator = user.username
+                room.initiator = session['username']
+                room.proficiency = userProf.fluency
                 target = room.receiver
                 database.session.commit()
                 foundRoom = True
@@ -68,7 +68,7 @@ def landing():
                 searchRange += 1
 
         if(not foundRoom):
-            newRoom = Rooms(receiver=session['username'], roomId=UNIQUE_ROOMID_CHANGE_LATER)
+            newRoom = Rooms(receiver=session['username'])
             database.session.add(newRoom)
             database.session.commit()
         
@@ -83,18 +83,18 @@ def landing():
         #   add their name in the other field of the entry
 
 
-        if not username or not target: #Error Check
-            return render_template('messaging/message_landing.html') #Add some kind of error message
-        print(username + " is calling " + target)
+        #if not username or not target: #Error Check
+            #return render_template('messaging/message_landing.html') #Add some kind of error message
+        #print(username + " is calling " + target)
 
         #Insert code to generate unique connection for WebRTC nonsense?
 
         #Cookie to store information about connection
         res = make_response(redirect(url_for('msg.msgChannel')))
         if(foundRoom):
-            res.set_cookie(key="channel_info", value=username+":"+target+":"+"initiator")
+            res.set_cookie(key="channel_info", value=session['username']+":"+target+":"+"initiator")
         else:
-            res.set_cookie(key="channel_info", value=username+":"+target+":"+"receiver")
+            res.set_cookie(key="channel_info", value=session['username']+":"+target+":"+"receiver")
         return res #Redirect user to their conversation channel
     return render_template('messaging/message_landing.html')
 
@@ -117,5 +117,9 @@ def msgChannel():
     else:
         temporary_identifier = "true"
     #return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room", identity=temporary_identifier)
-    room = Rooms.query.filter_by((initiator==user | receiver==user)).first()
-    return render_template('messaging/message_channel.html', target=target, user=user, user_room=room.roomId, identity=identifier)
+    room = Rooms.query.filter_by((Rooms.initiator==user | Rooms.receiver==user)).first()
+    if(identifier == "initiator"):
+        return render_template('messaging/message_channel.html', user=user, user_room=room.roomId, identity=identifier)
+    else:
+        return render_template('messaging/message_channel.html', target=target, user=user, user_room=room.roomId, identity=identifier)
+    #return render_template('messaging/message_channel.html', target=target, user=user, user_room=room.roomId, identity=identifier)

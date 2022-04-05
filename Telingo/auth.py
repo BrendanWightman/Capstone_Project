@@ -2,6 +2,8 @@ import functools
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
 
+from .db import User, database
+
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -33,7 +35,14 @@ def register():
             error = 'Password is required.'
 
         if error is None:
-            pass # Enter the data into the database
+            # ToDo:
+                # Still need to check if in the database before adding
+                # add error message
+                # Need to set uId to a new number every time
+                # Add language 
+            user = User(uId=1, username=username, password=User.set_password(password), native_lang="English", ban_status=0, report_status=0)
+            database.session.add(user)
+            database.session.commit()
 
 
         flash(error)
