@@ -147,6 +147,7 @@ function setupReceiveListeners(){
 function sendMessage(){
   console.log("Sending Message");
   var message = messageInput.value;
+  message = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     if(message != ''){
     // Log message Locally + Send
     messageDisplay.innerHTML += "<tr><td>" + username + ": " + message + "</td></tr>";
