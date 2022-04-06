@@ -166,17 +166,19 @@ function sendMessage(){
 function dictSearch(){
   console.log("Searching Term");
   var value = dictText.value;
-  if(value != ''){
+  value = value.toLowerCase();
+  if(value != '' && !value.includes(' ')){
     dictText.value = '';
     dictText.disabled = true;
     dictButton.disabled = true;
+    dictResult.innerHTML = value + ": ";
     socket.emit('Dictionary', {'text': value, 'language': language});
   }
-
-  // Dictionary Response listener
-  socket.on('Dictionary-Response', function(data){
-    dictResult.innerHTML = data.text;
-    dictText.disabled = false;
-    dictButton.disabled = false;
-  })
 }
+
+// Dictionary Response listener
+socket.on('Dictionary-Response', function(data){
+  dictResult.innerHTML += data.text;
+  dictText.disabled = false;
+  dictButton.disabled = false;
+});
