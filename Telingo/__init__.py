@@ -63,7 +63,7 @@ def create_app(test_config=None):
         querystring = {"text":data['text'],"language":data['language']}
         headers = {
         	"X-RapidAPI-Host": "lexicala1.p.rapidapi.com",
-        	"X-RapidAPI-Key": "6a202a2613msh766171f7a5939e9p1d0931jsne67de9c0e19f"
+        	"X-RapidAPI-Key": ""
         }
 
         #Get result and convert into json format
