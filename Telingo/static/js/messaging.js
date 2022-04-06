@@ -11,12 +11,16 @@ var connectedCount = 0;
 const messageInput = document.querySelector('input#message');
 const messageDisplay = document.querySelector('tbody#text_chat');
 const sendButton = document.querySelector('button#send');
+const dictText = document.querySelector('input#search');
+const dictButton = document.querySelector('button#lookup');
+const dictResult = document.querySelector('p#definition');
 const closeButton = document.querySelector('button#disconnect');
 const remoteVideo = document.querySelector('video#remoteVideo');
 
 // Bind Buttons to functions
 //closeButton.onclick = terminateConnection; <- Needs function implemented first
 sendButton.onclick = sendMessage;
+dictButton.onclick = dictSearch;
 
 // Media Constraints
 
@@ -156,4 +160,23 @@ function sendMessage(){
     messageInput.value="";
     messageDisplay.scrollTop = messageDisplay.scrollHeight;
   }
+}
+
+// Looking something up from the dictionary
+function dictSearch(){
+  console.log("Searching Term");
+  var value = dictText.value;
+  if(value != ''){
+    dictText.value = '';
+    dictText.disabled = true;
+    dictButton.disabled = true;
+    socket.emit('Dictionary', {'text': value, 'language': language});
+  }
+
+  // Dictionary Response listener
+  socket.on('Dictionary-Response', function(data){
+    dictResult.innerHTML = data.text;
+    dictText.disabled = false;
+    dictButton.disabled = false;
+  })
 }

@@ -11,6 +11,7 @@
     var username = "{{user}}"
     var target = "{{target}}"
     var room_ID = "{{user_room}}"
+    var language = "{{language}}"
     var initiator = {{identity}} //True = Initiator, False = Reciever
     var socket = io();
 </script>
@@ -38,8 +39,9 @@
             <p>example topic<br>example topic<br>example topic<br>example topic</p>
         </div>
         <div class="col">
-            <h1 class="fs-3">Other user</h1>
-            <p>user info<br>user info<br>user info<br>user info</p>
+            <h1 class="fs-3">Dictionary Lookup</h1>
+            <p id="definition"></p>
+            <input type="text" id="search" name="search"><button type="button" id="lookup">Lookup</button>
         </div>
     </div>
 
@@ -75,7 +77,13 @@
     if (e.key === "Enter"){
       sendMessage();
     }
-  })
+  });
+  var dictLookup = document.getElementById("search");
+  dictLookup.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      dictSearch();
+    }
+  });
 </script>
 
 {% endblock%}

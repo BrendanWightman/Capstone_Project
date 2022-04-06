@@ -1,4 +1,4 @@
-import os
+import os, requests, json
 
 from flask import Flask, render_template
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
@@ -52,6 +52,31 @@ def create_app(test_config=None):
     def send_message(data):
         print('passing message')
         emit('Message', data, to=data['room'])
+
+    #Dictionary Lookup
+    @socketio.on("Dictionary")
+    def search_term(data):
+        print('searching for term...')
+
+        #Set up request based on data passed
+        url = "https://lexicala1.p.rapidapi.com/search"
+        querystring = {"text":data['text'],"language":data['language']}
+        headers = {
+        	"X-RapidAPI-Host": "lexicala1.p.rapidapi.com",
+        	"X-RapidAPI-Key": "6a202a2613msh766171f7a5939e9p1d0931jsne67de9c0e19f"
+        }
+
+        #Get result and convert into json format
+        response = requests.request("GET", url, headers=headers, params=querystring)
+        dict = response.json()
+
+        #Check for no result
+        if dict.get('n_results') == 0:
+            emit('Dictionary-Response', {'text': "No Results Found"})
+            return
+        #Get result and send it
+        definition = dict.get('results')[0].get('senses')[0].get("definition")
+        emit('Dictionary-Response', {'text': definition})
 
     # ensure the instance folder exists
     try:

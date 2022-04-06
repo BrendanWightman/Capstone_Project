@@ -44,4 +44,7 @@ def msgChannel():
         temporary_identifier = "false"
     else:
         temporary_identifier = "true"
-    return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room", identity=temporary_identifier)
+    #Temp language is always english, make sure you use 2 char identifier
+    language = "en"
+
+    return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room", identity=temporary_identifier, language=language)
