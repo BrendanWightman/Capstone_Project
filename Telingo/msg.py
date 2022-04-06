@@ -1,3 +1,4 @@
+import json, random, os
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, make_response
 )
@@ -5,7 +6,10 @@ from flask_socketio import join_room, leave_room, SocketIO
 
 
 msg = Blueprint("msg", __name__)
-
+#Open and load file for random topics, maybe change later
+topics_f = open('Telingo/static/conversation_topics.json')
+topics = json.load(topics_f).get('topics')
+topics_f.close()
 
 #Route for message landing page
 @msg.route('/msg', methods=('GET', 'POST'))
@@ -47,4 +51,11 @@ def msgChannel():
     #Temp language is always english, make sure you use 2 char identifier
     language = "en"
 
-    return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room", identity=temporary_identifier, language=language)
+    #Double check there isn't a more efficient way to do this
+    rand = random.randint(0, len(topics)/4) * 4
+    top1 = topics[rand]
+    top2 = topics[rand+1]
+    top3 = topics[rand+2]
+    top4 = topics[rand+3]
+
+    return render_template('messaging/message_channel.html', target=target, user=user, user_room="Test_Room", identity=temporary_identifier, language=language, top1=top1, top2=top2, top3=top3, top4=top4)
