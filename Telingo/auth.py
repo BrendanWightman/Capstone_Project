@@ -1,4 +1,6 @@
+from calendar import day_abbr
 import functools
+from multiprocessing.reduction import duplicate
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
 
@@ -23,31 +25,36 @@ auth = Blueprint("auth", __name__, url_prefix='/auth')
 @auth.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        new_username = request.form['username']
+        new_password = request.form['password']
         # Get database
         error = None
 
-        if not username:
+        if not new_username:
             error = 'Username is required.'
-        elif not password:
+        elif not new_password:
             error = 'Password is required.'
 
         if error is None:
-            # ToDo:
-                # Still need to check if in the database before adding
+            # ToDo:                
                 # add error message
-                # Need to set uId to a new number every time
-                # Add language 
-            user = User(uId=2, username=username, password=User.set_password(password))
+                # Need to set uId to a new number every time                
+
+            #if username already exists in database
+            if database.session.query(database.exists().where(User.username == new_username)).scalar():
+                return render_template('register.html', duplicate = True)
+
+
+            #add user to database
+            user = User(uId=2, username=new_username, password=User.set_password(new_password))
             database.session.add(user)
             database.session.commit()
 
+            return redirect(url_for('login'))
 
         flash(error)
 
     return render_template('auth/register.html')
-
 
 
 
@@ -63,23 +70,31 @@ def login():
         password = request.form['password']
         # Get the database
         
+        user = User.query.filter_by(username = username).first()      
+
         error = None
 
         # Check username is in the databse
         # if not set error = "Incorrect Username or Password"
+        if not user:
+            return render_template('login.html', loginFailed = True)   
 
         # Check hashed password to matching username
         # if wrong set error = "Incorrect Username or Password"
+        if check_password_hash(user.password, password):
+            session["name"] = request.form.get("username")
+            return redirect(url_for('home'))
+        
+        return render_template('login.html', loginFailed = True)
 
-        # if error is None:
+    return render_template('login.html')
+
+     # if error is None:
         #   session.clear()
         #   session['user_id'] = USERID FROM DATABASE
         #   return redirect(url_for('index'))
         
-        #flash(error)
-
-    return render_template('auth/login.html')
-
+        #flash(error)      
 
 
 
