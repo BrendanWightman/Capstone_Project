@@ -1,4 +1,4 @@
-import json, random, os
+import json, random
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, make_response
 )
