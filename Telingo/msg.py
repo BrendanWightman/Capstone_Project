@@ -52,7 +52,7 @@ def msgChannel():
     language = "en"
 
     #Double check there isn't a more efficient way to do this
-    rand = random.randint(0, len(topics)/4) * 4
+    rand = random.randint(0, (len(topics)/4)-1) * 4
     top1 = topics[rand]
     top2 = topics[rand+1]
     top3 = topics[rand+2]
