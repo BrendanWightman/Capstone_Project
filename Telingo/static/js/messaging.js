@@ -8,6 +8,7 @@ var localStream; // Local video + audio
 var remoteStream; // Remote video + audio
 var connectedCount = 0;
 var callStarted = false;
+var duplicateCatch = false;
 // Document Elements
 const messageInput = document.querySelector('input#message');
 const messageDisplay = document.querySelector('tbody#text_chat');
@@ -51,7 +52,10 @@ async function getMicAndCam(){
       if(audioDevices.length != 0 && videoDevices.length != 0){
         console.log(videoDevices);
         deviceModal.style.display = "none";
-        socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
+        if(!duplicateCatch){
+          socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
+        }
+        duplicateCatch = true;
       }
       else{
         deviceModal.style.display = "block";
