@@ -7,6 +7,8 @@ var receiveChannel; // Remote text
 var localStream; // Local video + audio
 var remoteStream; // Remote video + audio
 var connectedCount = 0;
+var readyToCall = false;
+var callStarted = false;
 // Document Elements
 const messageInput = document.querySelector('input#message');
 const messageDisplay = document.querySelector('tbody#text_chat');
@@ -16,6 +18,7 @@ const dictButton = document.querySelector('button#lookup');
 const dictResult = document.querySelector('p#definition');
 const closeButton = document.querySelector('button#disconnect');
 const remoteVideo = document.querySelector('video#remoteVideo');
+const deviceModal = document.querySelector('div#deviceNotif');
 
 // Bind Buttons to functions
 //closeButton.onclick = terminateConnection; <- Needs function implemented first
@@ -31,17 +34,44 @@ const constraints ={
   },
   'audio': true
 }
+
 navigator.mediaDevices.getUserMedia(constraints)
   .then(stream => {
       console.log('Got MediaStream:', stream);
-      // Once we get the stream, join room for call
-      socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
   })
   .catch(error => {
       //Add troubleshooting here, will require active listening and more code
       console.error('Error accessing media devices.', error);
   });
 
+async function getMicAndCam(){
+  navigator.mediaDevices.enumerateDevices()
+    .then(devices => {
+      const audioDevices = devices.filter(device => device.kind === 'audioinput');
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      if(audioDevices.length != 0 && videoDevices.length != 0){
+        console.log(videoDevices);
+        deviceModal.style.display = "none";
+        makeCall();
+      }
+      else{
+        deviceModal.style.display = "block";
+      }
+    })
+}
+
+function checkForDevices(){
+  console.log("checking for devices");
+  if(!readyToCall) return;
+  getMicAndCam();
+}
+
+
+navigator.mediaDevices.addEventListener('devicechange', event => {
+  if(!callStarted){
+    checkForDevices();
+  }
+});
 
 // Signaling-server socket listener:
 socket.on('Message', async function(message){
@@ -73,8 +103,10 @@ socket.on('Message', async function(message){
 // Function to set up connection
 async function makeCall(){
   console.log("Initiating");
+  callStarted = true;
   const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
   // Set up local streams and channels in advance
+
   localStream = await navigator.mediaDevices.getUserMedia(constraints);
   remoteConnection = new RTCPeerConnection(configuration);
   localStream.getTracks().forEach(track => {
