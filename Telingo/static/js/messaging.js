@@ -47,23 +47,25 @@ navigator.mediaDevices.getUserMedia(constraints)
 async function getMicAndCam(){
   navigator.mediaDevices.enumerateDevices()
     .then(devices => {
+      // Get both device kinds
       const audioDevices = devices.filter(device => device.kind === 'audioinput');
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      // If there's at least one of each, go ahead
       if(audioDevices.length != 0 && videoDevices.length != 0){
         console.log(videoDevices);
-        deviceModal.style.display = "none";
-        if(!duplicateCatch){
+        deviceModal.style.display = "none"; // Clear Popup
+        if(!duplicateCatch){ // Make sure room not already joined before joining
           socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
         }
         duplicateCatch = true;
       }
       else{
-        deviceModal.style.display = "block";
+        deviceModal.style.display = "block"; // Display Error Popup
       }
     })
 }
 
-
+// Listener for connecting new devices
 navigator.mediaDevices.addEventListener('devicechange', event => {
   if(!callStarted){
     getMicAndCam();
