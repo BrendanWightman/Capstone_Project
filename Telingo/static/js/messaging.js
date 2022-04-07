@@ -7,7 +7,6 @@ var receiveChannel; // Remote text
 var localStream; // Local video + audio
 var remoteStream; // Remote video + audio
 var connectedCount = 0;
-var readyToCall = false;
 var callStarted = false;
 // Document Elements
 const messageInput = document.querySelector('input#message');
@@ -52,7 +51,7 @@ async function getMicAndCam(){
       if(audioDevices.length != 0 && videoDevices.length != 0){
         console.log(videoDevices);
         deviceModal.style.display = "none";
-        makeCall();
+        socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
       }
       else{
         deviceModal.style.display = "block";
@@ -60,16 +59,10 @@ async function getMicAndCam(){
     })
 }
 
-function checkForDevices(){
-  console.log("checking for devices");
-  if(!readyToCall) return;
-  getMicAndCam();
-}
-
 
 navigator.mediaDevices.addEventListener('devicechange', event => {
   if(!callStarted){
-    checkForDevices();
+    getMicAndCam();
   }
 });
 

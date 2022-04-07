@@ -65,7 +65,7 @@
 // Socket Listeners (Maybe move into JS file?)
   socket.on('connect', function() {
       socket.emit('FirstConnect', {info: 'I\'m connected!'});
-      socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
+      getMicAndCam();
   });
 
  // Listeners to ensure connection sequence does not start until both on webpage
@@ -81,9 +81,8 @@
   });
 
   socket.on('startCall', function(){
-    readyToCall = true;
     console.log("checking for from startCall");
-    checkForDevices();
+    makeCall();
   });
 
 // Other listeners:
