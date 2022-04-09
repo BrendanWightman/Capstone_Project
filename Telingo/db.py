@@ -107,14 +107,3 @@ class Rooms(database.Model):
     initiator = database.Column(database.String(50))
     receiver = database.Column(database.String(50))
     proficiency = database.Column(database.Integer())
-
-    #functions to create and check hashed passwords
-    def set_password(self,password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self,password):
-        return check_password_hash(self.password_hash,password)    
-
-    #function to return a string when new data is added
-    def __repr__(self):
-        return '<name %r>' % self.uId
