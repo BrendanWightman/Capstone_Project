@@ -4,7 +4,7 @@ from multiprocessing.reduction import duplicate
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
 
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 
 from .db import database, User
 
@@ -27,13 +27,18 @@ def register():
     if request.method == 'POST':
         new_username = request.form['username']
         new_password = request.form['password']
+        new_native_lang = request.form['native_lang']
+        new_language = request.form['language']
+        
+        
         # Get database
         error = None
 
         if not new_username:
             error = 'Username is required.'
         elif not new_password:
-            error = 'Password is required.'
+            error = 'Password is required.'        
+        
 
         if error is None:
             # ToDo:                
@@ -42,15 +47,17 @@ def register():
 
             #if username already exists in database
             if database.session.query(database.exists().where(User.username == new_username)).scalar():
+                error= 'Username already exists.'
                 return render_template('register.html', duplicate = True)
 
 
             #add user to database
-            user = User(uId=2, username=new_username, password=User.set_password(new_password))
+            user = User(uId=2, username=new_username,report_status=0,ban_status=0,native_lang=new_native_lang,language=new_language)
+            user.set_password(new_password)
             database.session.add(user)
             database.session.commit()
 
-            return redirect(url_for('login'))
+            return render_template('auth/login.html')
 
         flash(error)
 
@@ -85,9 +92,9 @@ def login():
             session["name"] = request.form.get("username")
             return redirect(url_for('home'))
         
-        return render_template('login.html', loginFailed = True)
+        return render_template('auth/login.html', loginFailed = True)
 
-    return render_template('login.html')
+    return render_template('auth/login.html')
 
      # if error is None:
         #   session.clear()
