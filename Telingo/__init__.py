@@ -2,9 +2,11 @@ import os
 
 from flask import Flask, render_template
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
+from flask_sqlalchemy import SQLAlchemy
 from . import auth
 from . import home
 from . import msg
+from .db import database
 
 socketio = SocketIO()
 
@@ -18,12 +20,19 @@ def create_app(test_config=None):
     #
     app.secret_key = 'dev'
 
-    app.config.from_pyfile('config.py', silent=True)
-    
+    #app.config.from_pyfile('config.py', silent=True)
+    app.config.from_object('config')
+
     app.debug = 'debug'
 
     # Intialize SocketIO
     socketio.init_app(app)
+
+
+  # Initialize the database
+    database.app = app
+    database.init_app(app)
+    database.create_all()
 
     # ensure the instance folder exists
     try:
