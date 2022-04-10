@@ -4,9 +4,9 @@ from multiprocessing.reduction import duplicate
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
 
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from .db import English, database, User
+from .db import Language, database, User
 
 #
 # Any routes that begin with /auth will be sent here 
@@ -30,8 +30,6 @@ def register():
         new_native_lang = request.form['native_lang']
         new_language = request.form['language']
         
-        
-        # Get database
         error = None
 
         if not new_username:
@@ -46,25 +44,40 @@ def register():
                 # Need to set uId to a new number every time                
 
             #if username already exists in database
-            if database.session.query(database.exists().where(User.username == new_username)).scalar():
-                error= 'Username already exists.'
-                return render_template('auth/register.html', duplicate = True)
+            # if database.session.query(database.exists().where(User.username == new_username)).scalar():
+            #     error= 'Username already exists.'
+            #     return render_template('auth/register.html', duplicate = True)
 
 
-            #add user to database
-            user = User(uId=2, username=new_username,report_status=0,ban_status=0,native_lang=new_native_lang,language=new_language)
-            user.set_password(new_password) #hashing done here to ensure plaintext is never inserted into the database
+            # #add user to database
+            # user = User(uId=2, username=new_username,report_status=0,ban_status=0,native_lang=new_native_lang,language=new_language)
+            # user.set_password(new_password) #hashing done here to ensure plaintext is never inserted into the database
+            # database.session.add(user)
+            # database.session.commit()
+
+            # if user.language == 'English':                                        #adding to english language
+            #     user_lang = English(language = English, uId = user.uId,fluency=1)
+            #     database.session.add(user_lang)
+            #     database.session.commit()
+
+
+            # Might be a better way to do this, but it will work for now
+            # Pick last entry by uId then we increment
+            userId = User.query.order_by(-User.uId).first()
+
+            # Error checking if the query is empty
+            if not userId:
+                user = User(uId=0, username=new_username, password=generate_password_hash(new_password), report_status=0, ban_status=0, native_lang=new_native_lang)
+            else:
+                user = User(uId=userId.uId + 1, username=new_username, password=generate_password_hash(new_password), report_status=0, ban_status=0, native_lang=new_native_lang)
+           
+            language = Language(language=new_language, fluency=0)
+            user.languages.append(language)
+
             database.session.add(user)
             database.session.commit()
 
-            if user.language == 'English':                                        #adding to english language
-                user_lang = English(language = English, uId = user.uId,fluency=1)
-                database.session.add(user_lang)
-                database.session.commit()
-
-
-
-            return render_template('auth/login.html')
+            return redirect(url_for('auth.login'))
 
         flash(error)
 
@@ -96,8 +109,8 @@ def login():
         # Check hashed password to matching username
         # if wrong set error = "Incorrect Username or Password"
         if check_password_hash(user.password, password):
-            session["name"] = request.form.get("username")
-            return redirect(url_for('home'))
+            session["name"] = username
+            return redirect(url_for('home.index'))
         
         return render_template('auth/login.html', loginFailed = True)
 
