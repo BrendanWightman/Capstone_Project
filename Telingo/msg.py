@@ -16,7 +16,8 @@ def landing():
         language = request.form['language']
 
 
-        #user = User.query.filter_by(username=session['username']).first()
+        user = User.query.filter_by(username=session['username']).first()
+        Language.query.with_parent(user).filter(Language.language == language).all()
 
         # Map the database classes for the holding rooms
         databaseMappings = {
@@ -26,6 +27,8 @@ def landing():
             "Japanese" : japaneseHolding,
             "Spanish" : spanishHolding
         }
+
+
 
         # With the mappings we can dynamically choose what database to add to
         databaseHolding = databaseMappings[language]
