@@ -56,7 +56,7 @@ async function getMicAndCam(){
         console.log(videoDevices);
         deviceModal.style.display = "none"; // Clear Popup
         if(!duplicateCatch){ // Make sure room not already joined before joining
-          socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
+          preCallSetup();
         }
         duplicateCatch = true;
       }
@@ -100,23 +100,35 @@ socket.on('Message', async function(message){
   }
 });
 
+// Set up things in advance to avoid things not being defined once the call starts
+function preCallSetup(){
+  callStarted = true;
+  console.log("Setting up before call")
+  const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
+  remoteConnection = new RTCPeerConnection(configuration);
+  // Text Channel
+  sendChannel = remoteConnection.createDataChannel("from_" + username);
+  // Set up listeners
+  setupListeners();
+  //Need to make sure this finishes before we start to set up call, so format as async=>then
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(media=>{
+      // All Video/Audio related setup
+      localStream = media;
+      localVideo.srcObject = localStream; // Set up local video
+      localStream.getTracks().forEach(track => {
+        remoteConnection.addTrack(track, localStream);
+      });
+      //Join the room and tell everyone we're ready to connect
+      socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
+    });
+}
+
 // Function to set up connection
 async function makeCall(){
   console.log("Initiating");
-  callStarted = true;
-  const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
-  // Set up local streams and channels in advance
-  localStream = await navigator.mediaDevices.getUserMedia(constraints);
-  localVideo.srcObject = localStream; // Set up local video
-  remoteConnection = new RTCPeerConnection(configuration);
-  localStream.getTracks().forEach(track => {
-    remoteConnection.addTrack(track, localStream);
-  });
-  sendChannel = remoteConnection.createDataChannel("from_" + username);
-  setupListeners();
   if(initiator){
     console.log("Entering as initiator");
-
     const offer = await remoteConnection.createOffer();
     await remoteConnection.setLocalDescription(offer);
     socket.emit('Message', {'offer': offer, 'room':room_ID, 'from':username});
@@ -125,7 +137,7 @@ async function makeCall(){
   else{
     console.log("Entering as reciever");
   }
-  console.log("Finished making call");
+  console.log("Finished Passing Connection Offers");
 }
 
 // Event Listener Setup
