@@ -1,11 +1,17 @@
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
+from flask import url_for, redirect, render_template
 from . import socketio
+from .db import *
 
 #SocketIO Listeners
 @socketio.on("FirstConnect")
 def testFunction(data):
     print('recieved: ' + data['info']) #Can remove / replace with any first-connection function
 
+@socketio.on("transfer")
+def transfer(data):
+    room = data['room']
+    emit('transferPage', url_for('msg.msgChannel'), to=room)
 
 #Functions for Initiating Call
 @socketio.on("joinCallRoom")
@@ -26,6 +32,11 @@ def sendStartMessage(data):
 def on_leave(data):
     room = data['room']
     leave_room(room)
+
+    # Make sure this works later
+    roomDb = Room.query.filter_by(roomId=room)
+    if roomDb:
+        database.session.delete(roomDb)
     print('leaving room: ' + room)
 
 #Message Passer (Needed for Signaling Server)
