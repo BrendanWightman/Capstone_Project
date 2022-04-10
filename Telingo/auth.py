@@ -38,15 +38,15 @@ def register():
             error = 'Password is required.'        
         
 
+
+            #if username already exists in database
+        if database.session.query(database.exists().where(User.username == new_username)).scalar():
+            error = 'Username already exists.'
+
         if error is None:
             # ToDo:                
                 # add error message
                 # Need to set uId to a new number every time                
-
-            #if username already exists in database
-            # if database.session.query(database.exists().where(User.username == new_username)).scalar():
-            #     error= 'Username already exists.'
-            #     return render_template('auth/register.html', duplicate = True)
 
 
             # #add user to database
