@@ -20,11 +20,12 @@ const closeButton = document.querySelector('button#disconnect');
 const localVideo = document.querySelector('video#localVideo');
 const remoteVideo = document.querySelector('video#remoteVideo');
 const deviceModal = document.querySelector('div#deviceNotif');
-
+const leaveButton = document.querySelector('button#endCall');
 // Bind Buttons to functions
 //closeButton.onclick = terminateConnection; <- Needs function implemented first
 sendButton.onclick = sendMessage;
 dictButton.onclick = dictSearch;
+leaveButton.onclick = closeCall;
 
 // Media Constraints
 
@@ -35,15 +36,6 @@ const constraints ={
   },
   'audio': true
 }
-
-navigator.mediaDevices.getUserMedia(constraints)
-  .then(stream => {
-      console.log('Got MediaStream:', stream);
-  })
-  .catch(error => {
-      //Add troubleshooting here, will require active listening and more code
-      console.error('Error accessing media devices.', error);
-  });
 
 async function getMicAndCam(){
   navigator.mediaDevices.enumerateDevices()
@@ -151,8 +143,10 @@ function setupListeners(){
 
   remoteConnection.addEventListener('connectionstatechange', event => {
       if (remoteConnection.connectionState === 'connected') {
-        // Insert any code that needs to execute on connection here
-        console.log("We're connected!");
+        leaveButton.disabled=false;
+      }
+      else if (remoteConnection.connectionState === 'disconnected'){
+        closeCall();
       }
   });
 
@@ -226,3 +220,10 @@ socket.on('Dictionary-Response', function(data){
   dictText.disabled = false;
   dictButton.disabled = false;
 });
+
+// Function to execute once the call is closed
+function closeCall(){
+  console.log("They left D:<");
+  leaveButton.disabled=true;
+  remoteConnection.close();
+}
