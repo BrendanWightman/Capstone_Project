@@ -98,7 +98,6 @@ def login():
         # Get the database
         
         user = User.query.filter_by(username = username).first()      
-
         error = None
 
         # Check username is in the databse

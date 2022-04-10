@@ -23,6 +23,10 @@ class Language(database.Model):
     language = database.Column(database.String(50), primary_key = True)
     fluency = database.Column(database.Integer)   
 
+# Example of a language query
+# Language.query.with_parent(user).filter(Language.language == 'French').all()
+# Returns the results of "user's" Language where language = 'French'
+
 
 #Reporting database
 class Report(database.Model):
