@@ -3,10 +3,14 @@ import functools
 from multiprocessing.reduction import duplicate
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
+from password_validation import PasswordPolicy
+
+
+
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .db import Language, database, User
+from .db import Admin, Language, database, User
 
 #
 # Any routes that begin with /auth will be sent here 
@@ -103,7 +107,7 @@ def login():
         # Check username is in the databse
         # if not set error = "Incorrect Username or Password"
         if not user:
-            return render_template('login.html', loginFailed = True)   
+            return render_template('auth/login.html', loginFailed = True)   
 
         # Check hashed password to matching username
         # if wrong set error = "Incorrect Username or Password"
@@ -121,6 +125,32 @@ def login():
         #   return redirect(url_for('index'))
         
         #flash(error)      
+
+
+#
+#Admin Login page
+#
+
+@auth.route('/adminlogin', methods=('GET', 'POST'))
+def loggin():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        admin = Admin.query.filter_by(username = username).first()
+        error = None
+        
+        if not admin:
+            return render_template('auth/admin.html', loginFailed=True)
+
+        if check_password_hash(admin.password, password):
+            session["name"] = username
+            return redirect(url_for('home.index'))    
+
+        return render_template('auth/adminlogin.html', loginFailed = True)
+
+    return render_template('auth/adminlogin.html')     
+    
 
 
 
