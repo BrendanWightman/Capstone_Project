@@ -1,6 +1,6 @@
 import os, requests, json
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
 from . import auth
 from . import home
@@ -21,9 +21,18 @@ def create_app(test_config=None):
     socketio.run(app) #Look into alternative for this or w/e
 
     #SocketIO Listeners
+    userCalls = {} #Dictionary to map UserIDs to their active calls
     @socketio.on("FirstConnect")
     def testFunction(data):
-        print('recieved: ' + data['info']) #Can remove / replace with any first-connection function
+        print("User Joined: " + request.sid + " will be in room " + data['room'])
+        userCalls[request.sid] = data['room']
+
+    #Will get called a while after the user disconnects
+    @socketio.on("disconnect")
+    def disconnectFunction():
+        print("User Left: " + request.sid)
+        print("Cleaning up " + userCalls[request.sid])
+        del userCalls[request.sid] #delete element from dictionary
 
     #Functions for Initiating Call
     @socketio.on("joinCallRoom")

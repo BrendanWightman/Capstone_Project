@@ -16,10 +16,10 @@
     var socket = io();
 
     window.addEventListener('beforeunload', function (e) {
-            socket.emit('FirstConnect');
-            //e.preventDefault();
-            e.returnValue = '';
-        });
+      e.preventDefault();
+      e.returnValue = '';
+    });
+
 </script>
 
 <h1>Video call</h1>
@@ -80,7 +80,7 @@
 <script type="text/javascript" charset="utf-8">
 // Socket Listeners (Maybe move into JS file?)
   socket.on('connect', function() {
-      socket.emit('FirstConnect', {info: 'I\'m connected!'});
+      socket.emit('FirstConnect', {room: (room_ID)});
       getMicAndCam();
   });
 
