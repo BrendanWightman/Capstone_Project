@@ -8,8 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 database = SQLAlchemy()
     
 class User(database.Model):
-    username  = database.Column(database.String(50), primary_key = True, unique=True,nullable = False)
-    uId  = database.Column(database.Integer, nullable = False)
+    uId  = database.Column(database.Integer, primary_key = True,  nullable = False)
+    username  = database.Column(database.String(50), unique=True,nullable = False)
     password  = database.Column(database.String(200),nullable = True)
     native_lang = database.Column(database.String(50))
     report_status = database.Column(database.Integer)
