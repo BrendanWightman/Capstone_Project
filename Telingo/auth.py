@@ -6,7 +6,7 @@ from flask import ( Blueprint, flash, g, redirect,
 
 from werkzeug.security import check_password_hash
 
-from .db import database, User
+from .db import English, database, User
 
 #
 # Any routes that begin with /auth will be sent here 
@@ -48,14 +48,21 @@ def register():
             #if username already exists in database
             if database.session.query(database.exists().where(User.username == new_username)).scalar():
                 error= 'Username already exists.'
-                return render_template('register.html', duplicate = True)
+                return render_template('auth/register.html', duplicate = True)
 
 
             #add user to database
             user = User(uId=2, username=new_username,report_status=0,ban_status=0,native_lang=new_native_lang,language=new_language)
-            user.set_password(new_password)
+            user.set_password(new_password) #hashing done here to ensure plaintext is never inserted into the database
             database.session.add(user)
             database.session.commit()
+
+            if user.language == 'English':                                        #adding to english language
+                user_lang = English(language = English, uId = user.uId,fluency=1)
+                database.session.add(user_lang)
+                database.session.commit()
+
+
 
             return render_template('auth/login.html')
 
