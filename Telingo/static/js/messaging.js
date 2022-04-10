@@ -17,6 +17,7 @@ const dictText = document.querySelector('input#search');
 const dictButton = document.querySelector('button#lookup');
 const dictResult = document.querySelector('p#definition');
 const closeButton = document.querySelector('button#disconnect');
+const localVideo = document.querySelector('video#localVideo');
 const remoteVideo = document.querySelector('video#remoteVideo');
 const deviceModal = document.querySelector('div#deviceNotif');
 
@@ -29,8 +30,8 @@ dictButton.onclick = dictSearch;
 
 const constraints ={
   'video': {
-    "width": 500,
-    "height": 281.25
+    "width": 1280,
+    "height": 720
   },
   'audio': true
 }
@@ -105,8 +106,8 @@ async function makeCall(){
   callStarted = true;
   const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
   // Set up local streams and channels in advance
-
   localStream = await navigator.mediaDevices.getUserMedia(constraints);
+  localVideo.srcObject = localStream; // Set up local video
   remoteConnection = new RTCPeerConnection(configuration);
   localStream.getTracks().forEach(track => {
     remoteConnection.addTrack(track, localStream);
