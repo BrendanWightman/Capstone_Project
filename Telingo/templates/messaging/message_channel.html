@@ -25,7 +25,7 @@
     <div class="row">
         <div class="col" style="position:relative;">
           <video id="remoteVideo" width="100%" height="100%" autoplay playsinline style="position:absolute; right:0px; bottom:0px;"></video>
-          <video id="localVideo" width="30%" height="30%" autoplay playsinline style="position:absolute; right:15px; bottom:0px;"></video>
+          <video id="localVideo" width="30%" height="30%" muted="true" autoplay playsinline style="position:absolute; right:15px; bottom:0px;"></video>
         </div>
         <div class="col">
             <div class="table-responsive" style="display: inline;" >
@@ -111,12 +111,18 @@
   })
 
   socket.on('terminateNoIce', function(){
-    if(!alreadyEnded){
-      console.log("Terminating call from Ice Candidates")
+    console.log("Got terminate notice");
+    window.setTimeout(endFromIceTerminate, 30000); //Give 1 minute to connect before trying
+  });
+
+  function endFromIceTerminate(){
+    console.log("Looking to terminate..." + " callInProgress is: " + callInProgress);
+    if(!alreadyEnded && !callInProgress){
+      console.log("Terminating call from Ice Candidates");
       alreadyEnded = true;
       closeCall();
     }
-  });
+  }
 
 // Other listeners:
  // Sends message if user presses 'enter' instead of 'send' button

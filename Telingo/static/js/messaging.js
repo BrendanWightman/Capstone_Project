@@ -233,7 +233,6 @@ socket.on('Dictionary-Response', function(data){
 // Function to execute once the call is closed
 function closeCall(){
   console.log("They left D:<");
-  socket.emit('FirstConnect', {info: 'I\'m connected!'});
   leaveButton.disabled=true;
   remoteConnection.close();
 }
