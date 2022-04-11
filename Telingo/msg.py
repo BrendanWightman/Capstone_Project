@@ -1,3 +1,4 @@
+import json, random
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, make_response, session
 )
@@ -5,7 +6,10 @@ from flask_socketio import join_room, leave_room, SocketIO, emit
 from .db import *
 
 msg = Blueprint("msg", __name__)
-
+#Open and load file for random topics, maybe change later
+topics_f = open('Telingo/static/conversation_topics.json')
+topics = json.load(topics_f).get('topics')
+topics_f.close()
 
 #Route for message landing page
 @msg.route('/msg', methods=('GET', 'POST'))
@@ -89,9 +93,17 @@ def msgChannel():
         #Add error message popup?
         return redirect(url_for('msg.landing'))
 
+    #Double check there isn't a more efficient way to do this
+    rand = random.randint(0, (len(topics)/4)-1) * 4
+    top1 = topics[rand]
+    top2 = topics[rand+1]
+    top3 = topics[rand+2]
+    top4 = topics[rand+3]
+      
     room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
     if(room.initiator==session['username']):
-        return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, user_room=room.roomId, identity="true")
+        return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, user_room=room.roomId, identity="true", top1=top1, top2=top2, top3=top3, top4=top4)
     else:
-        return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, user_room=room.roomId, identity="false")
+        return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, user_room=room.roomId, identity="false", top1=top1, top2=top2, top3=top3, top4=top4)
+
 

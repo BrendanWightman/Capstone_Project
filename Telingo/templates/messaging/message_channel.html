@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>P2P Text Chat</title>
-  <meta charset="UTF-8"/>
-  <link href="../../static/style.css" rel="stylesheet">
-</head>
+{% extends 'base.html' %}
+{% block bodyStyle %} <body style="width: 1080px;height: 1920px;"> {% endblock %}
+
+{% block content %}
 
 <!--Setup (Socketio, adapter, and variables) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
@@ -14,30 +11,77 @@
     var username = "{{user}}"
     var target = "{{target}}"
     var room_ID = "{{user_room}}"
+    var language = "{{language}}"
     var initiator = {{identity}} //True = Initiator, False = Reciever
     var socket = io();
+
+    window.addEventListener('beforeunload', function (e) {
+      e.preventDefault();
+      e.returnValue = '';
+    });
+
 </script>
 
-<h1>Your Conversation with {{target}}</h1>
-<body>
-  <div class="scrollBox" id="text_chat"></div>
-  <br><br>
-  <div>
-      <label for="message">Message:</label>
-      <input type="text" id="message" name="message" disabled>
-      <button id="send" disabled>Send</button><br><br>
-      <button id="disconnect">Disconnect</button>
-  </div>
+<h1>Video call</h1>
+    <div class="row">
+        <div class="col" style="position:relative;">
+          <video id="remoteVideo" width="100%" height="100%" autoplay playsinline style="position:absolute; right:0px; bottom:0px;"></video>
+          <video id="localVideo" width="30%" height="30%" autoplay playsinline style="position:absolute; right:15px; bottom:0px;"></video>
+        </div>
+        <div class="col">
+            <div class="table-responsive" style="display: inline;" >
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="1" colspan="1">Chat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="text_chat" style="overflow: scroll; display:block; height:200px;">
+                      <tr><td><i>Remember to be polite and that any inappropriate behavior is a bannable offense!</i></td></tr>
+                    </tbody>
+                </table>
+            </div><input type="text" id="message" name="message" disabled><button type="button" id="send" disabled>Send</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+          <div class="row">
+            <div class="col-8">
+              <h1 class="fs-3">Conversation Topics</h1>
+              <p>{{top1}}<br>{{top2}}<br>{{top3}}<br>{{top4}}</p>
+            </div>
+            <div class="col" style="position:relative;">
+                <button type="button" id="endCall" style="position:absolute; top:5px; right:20px;" disabled>Leave Call</button>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+            <h1 class="fs-3">Dictionary Lookup</h1>
+            <p id="definition"></p>
+            <input type="text" id="search" name="search"><button type="button" id="lookup">Lookup</button>
+        </div>
+    </div>
 
+
+    <!-- Popup for mediad devices -->
+    <div id="deviceNotif" class="modal" role="dialog" style="position:absolute; top:25%;">
+
+      <!-- Modal content -->
+      <div class="modal-content text-center">
+        <div class="modal-body">
+          <p>We could not detect a camera/microphone, please make sure your devices are plugged in properly.</p>
+        </div>
+      </div>
+
+    </div>
 
 <!--Javascript Functionality (ORDER MATTERS)-->
 <script type="text/javascript" src="../../static/js/messaging.js"></script>
 <script type="text/javascript" charset="utf-8">
 // Socket Listeners (Maybe move into JS file?)
   socket.on('connect', function() {
-      socket.emit('FirstConnect', {info: 'I\'m connected!'});
-      socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
-       // Change conditions required for this to happen, likely through some kind of join-room event listener
+      socket.emit('FirstConnect', {room: (room_ID)});
+      getMicAndCam();
   });
 
  // Listeners to ensure connection sequence does not start until both on webpage
@@ -64,6 +108,13 @@
     if (e.key === "Enter"){
       sendMessage();
     }
-  })
+  });
+  var dictLookup = document.getElementById("search");
+  dictLookup.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      dictSearch();
+    }
+  });
 </script>
-</body>
+
+{% endblock%}
