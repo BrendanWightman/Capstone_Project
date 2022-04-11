@@ -86,7 +86,7 @@
   socket.on('transferPage', function(dest){
     console.log("Transfering pages...");
     //socket.emit('leave', {room:(room_ID)});
-    //window.location.href = dest;
+    window.location.replace(dest);
 });
 
  // Listeners to ensure connection sequence does not start until both on webpage
