@@ -9,6 +9,7 @@ userCalls = {} #Dictionary to map UserIDs to their active calls
 def testFunction(data):
     if 'room' in data:
         print("User Joined: " + request.sid + " will be in room " + data['room'])
+        session['roomId'] = data['room']
         userCalls[request.sid] = data['room']
 
 @socketio.on("disconnect")
