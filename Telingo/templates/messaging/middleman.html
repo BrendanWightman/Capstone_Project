@@ -43,7 +43,7 @@
   });
 
   socket.on('startCall', function(){
-    makeCall();
+    //makeCall();
     socket.emit('transfer', {room:(room_ID), user:(username)});
   });
 
