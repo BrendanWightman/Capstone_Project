@@ -81,13 +81,13 @@
   socket.on('connect', function() {
       socket.emit('FirstConnect', {room: (room_ID)});
       getMicAndCam();
+      socket.emit('transfer', {room:(room_ID), user:(username)});
   });
 
  // Listeners to ensure connection sequence does not start until both on webpage
   socket.on('maybeStart', function(){
     console.log("Maybe Starting");
     if(connectedCount){
-      socket.emit('transfer', {room:(room_ID), user:(username)});
       console.log("Giving Go-ahead");
       socket.emit('startCall', {room: (room_ID)});
     }
