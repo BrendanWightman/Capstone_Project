@@ -47,6 +47,7 @@ def landing():
                     if((room.fluency + searchRange == uLanguage.fluency or room.fluency - searchRange == uLanguage.fluency) and room.language == language and room.initiator == None and not foundRoom):
                         room.initiator = session['username']
                         database.session.commit()
+                        session['roomId'] = room.roomId
                         foundRoom = True
                 searchRange += 1
 
@@ -58,6 +59,8 @@ def landing():
                 uRoom = Room(roomId=0, language=language, fluency=uLanguage.fluency, receiver=session['username'], initiator=None)
             else:
                 uRoom = Room(roomId=roomId.roomId + 1, language=language, fluency=uLanguage.fluency, receiver=session['username'], initiator=None)
+
+            session['roomId'] = uRoom.roomId
 
             database.session.add(uRoom)
             database.session.commit()
