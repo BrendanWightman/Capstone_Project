@@ -9,7 +9,6 @@ userCalls = {} #Dictionary to map UserIDs to their active calls
 def testFunction(data):
     if 'room' in data:
         print("User Joined: " + request.sid + " will be in room " + data['room'])
-        session['roomId'] = data['room']
         userCalls[request.sid] = data['room']
 
 @socketio.on("disconnect")
@@ -19,8 +18,6 @@ def disconnectFunction():
         print("Cleaning up " + userCalls[request.sid])
         # Delete entry in database
         roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
-        print(roomDb.roomId)
-        emit('transferPage', {'url':url_for('msg.landing')}, to=roomDb.roomId)
         if roomDb is not None:
             print(f"Deleting {roomDb}")
             if(roomDb.initiator == session['roomId']):
