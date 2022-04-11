@@ -7,7 +7,7 @@ from .db import *
 userCalls = {} #Dictionary to map UserIDs to their active calls
 @socketio.on("FirstConnect")
 def testFunction(data):
-    if (data['room']):
+    if 'room' in data:
         print("User Joined: " + request.sid + " will be in room " + data['room'])
         userCalls[request.sid] = data['room']
 
@@ -15,7 +15,7 @@ def testFunction(data):
 @socketio.on("disconnect")
 def disconnectFunction():
     print("User Left: " + request.sid)
-    if(userCalls[request.sid]):
+    if request.sid in userCalls:
         print("Cleaning up " + userCalls[request.sid])
         del userCalls[request.sid] #delete element from dictionary
 
