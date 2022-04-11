@@ -139,6 +139,10 @@ function setupListeners(){
       if (event.candidate) {
         socket.emit('Message', {'new_ice_candidate': event.candidate, 'room':room_ID, 'from':username});
       }
+      else{
+        console.log("we have run out of options");
+        // Initiate shutdown Sequence somehow
+      }
   });
 
   remoteConnection.addEventListener('connectionstatechange', event => {
