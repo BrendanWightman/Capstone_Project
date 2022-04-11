@@ -35,22 +35,19 @@
     console.log("Maybe Starting");
     if(connectedCount){
       console.log("Giving Go-ahead");
-      socket.emit('startCall', {room: (room_ID)});
+      socket.emit('transfer', {room:(room_ID)});
     }
     else{
       connectedCount++;
     }
   });
 
-  socket.on('startCall', function(){
-    makeCall();
-    socket.emit('transfer', {room:(room_ID), user:(username)});
-  });
 
 // Other listeners:
 
 socket.on('transferPage', (dest) =>{
-    window.location.href = dest;
+  //socket.emit('leave', {room:(room_ID)});
+  window.location.replace(dest);
 });
 </script>
 </body>

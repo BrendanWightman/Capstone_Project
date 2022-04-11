@@ -12,9 +12,20 @@ def testFunction(data):
         print("User Joined: " + request.sid + " will be in room " + data['room'])
         userCalls[request.sid] = data['room']
 
-#Will get called a while after the user disconnects
 @socketio.on("disconnect")
 def disconnectFunction():
+    # Delete entry in database
+    roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
+    print(session['roomId'])
+    emit('transferPage', url_for('msg.landing'), to=roomDb.roomId)
+    if roomDb is not None:
+        print(f"Deleting {roomDb}")
+        if(roomDb.initiator == session['roomId']):
+            roomDb.initiator = None
+        if(roomDb.receiver == session['roomId'] and roomDb.initiator == None):
+            database.session.delete(roomDb)
+        database.session.commit()
+        session['roomId'] = None
     print("User Left: " + request.sid)
     if request.sid in userCalls:
         print("Cleaning up " + userCalls[request.sid])
@@ -44,11 +55,6 @@ def sendStartMessage(data):
 def on_leave(data):
     room = data['room']
     leave_room(room)
-
-    # Make sure this works later
-    roomDb = Room.query.filter_by(roomId=room)
-    if roomDb:
-        database.session.delete(roomDb)
     print('leaving room: ' + room)
 
 #Message Passer (Needed for Signaling Server)
@@ -84,7 +90,7 @@ def search_term(data):
     }
 
     #Get result and convert into json format
-    response = requests.request("GET", url, headers=headers, params=querystring)
+    response = request.request("GET", url, headers=headers, params=querystring)
     dict = response.json()
 
     #Check for no result
