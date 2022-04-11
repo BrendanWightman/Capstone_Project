@@ -83,7 +83,7 @@ def search_term(data):
     }
 
     #Get result and convert into json format
-    response = request.request("GET", url, headers=headers, params=querystring)
+    response = request.requests("GET", url, headers=headers, params=querystring)
     dict = response.json()
 
     #Check for no result
