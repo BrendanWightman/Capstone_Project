@@ -2,9 +2,13 @@ import os, requests, json
 
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
+from flask_sqlalchemy import SQLAlchemy
 from . import auth
 from . import home
 from . import msg
+from .db import database
+
+socketio = SocketIO()
 
 def create_app(test_config=None):
     # create and configure the app
@@ -16,51 +20,20 @@ def create_app(test_config=None):
     #
     app.secret_key = 'dev'
 
-    app.config.from_pyfile('config.py', silent=True)
-    socketio = SocketIO(app)
-    socketio.run(app) #Look into alternative for this or w/e
+    #app.config.from_pyfile('config.py', silent=True)
+    app.config.from_object('config')
 
-    #SocketIO Listeners
-    userCalls = {} #Dictionary to map UserIDs to their active calls
-    @socketio.on("FirstConnect")
-    def testFunction(data):
-        print("User Joined: " + request.sid + " will be in room " + data['room'])
-        userCalls[request.sid] = data['room']
+    app.debug = 'debug'
 
-    #Will get called a while after the user disconnects
-    @socketio.on("disconnect")
-    def disconnectFunction():
-        print("User Left: " + request.sid)
-        print("Cleaning up " + userCalls[request.sid])
-        del userCalls[request.sid] #delete element from dictionary
-
-    #Functions for Initiating Call
-    @socketio.on("joinCallRoom")
-    def joiningRoom(data):
-        room = data['room']
-        join_room(room)
-        emit('maybeStart', to=room)
-        print('joined room: ' + room)
+    # Intialize SocketIO
+    socketio.init_app(app)
 
 
-    @socketio.on("startCall")
-    def sendStartMessage(data):
-        room = data['room']
-        emit('startCall', to=room)
-        print('sent start message')
+  # Initialize the database
+    database.app = app
+    database.init_app(app)
+    database.create_all()
 
-    #Possible Leave-Room Function
-    @socketio.on('leave')
-    def on_leave(data):
-        room = data['room']
-        leave_room(room)
-        print('leaving room: ' + room)
-
-    #Message Passer (Needed for Signaling Server)
-    @socketio.on("Message")
-    def send_message(data):
-        print('passing message')
-        emit('Message', data, to=data['room'])
 
     #Dictionary Lookup
     @socketio.on("Dictionary")

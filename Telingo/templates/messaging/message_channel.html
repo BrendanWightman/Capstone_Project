@@ -87,6 +87,7 @@
  // Listeners to ensure connection sequence does not start until both on webpage
   socket.on('maybeStart', function(){
     console.log("Maybe Starting");
+    socket.emit('transfer', {room:(room_ID), user:(username)});
     if(connectedCount){
       console.log("Giving Go-ahead");
       socket.emit('startCall', {room: (room_ID)});
