@@ -21,9 +21,7 @@ def disconnectFunction():
         print(roomDb)
         if roomDb is not None:
             print(f"Deleting {roomDb}")
-            if(roomDb.roomId != session['username']):
-                print("Here!!!!")
-                #emit('transferPage', {'url':url_for('msg.landing')}, to=roomDb.roomId)
+            emit('transferPage', {'url':url_for('msg.landing')}, to=roomDb.roomId)
             if(roomDb.initiator == session['roomId']):
                 roomDb.initiator = None
             if(roomDb.receiver == session['roomId'] and roomDb.initiator == None):
