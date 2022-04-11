@@ -83,7 +83,7 @@
       getMicAndCam();
   });
 
-  socket.on('transferPage', (dest) =>{
+  socket.on('transferPage', function(dest){
     console.log("Transfering pages...");
     //socket.emit('leave', {room:(room_ID)});
     window.location.href = dest;
