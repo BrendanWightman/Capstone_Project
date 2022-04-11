@@ -83,6 +83,11 @@
       getMicAndCam();
   });
 
+  socket.on('transferPage', (dest) =>{
+    socket.emit('leave', {room:(room_ID)});
+    window.location.href = dest;
+});
+
  // Listeners to ensure connection sequence does not start until both on webpage
   socket.on('maybeStart', function(){
     console.log("Maybe Starting");
