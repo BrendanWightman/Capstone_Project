@@ -13,21 +13,20 @@ def testFunction(data):
 
 @socketio.on("disconnect")
 def disconnectFunction():
+    # Delete entry in database
+    roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
+    emit('transferPage', url_for('msg.landing'), to=roomDb.roomId)
+    if roomDb is not None:
+        print(f"Deleting {roomDb}")
+        if(roomDb.initiator == session['roomId']):
+            roomDb.initiator = None
+        if(roomDb.receiver == session['roomId'] and roomDb.initiator == None):
+            database.session.delete(roomDb)
+        database.session.commit()
+        session['roomId'] = None
     print("User Left: " + request.sid)
     if request.sid in userCalls:
         print("Cleaning up " + userCalls[request.sid])
-
-        # Delete entry in database
-        roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
-        emit('transferPage', url_for('msg.landing'), to=roomDb.roomId)
-        if roomDb is not None:
-            print(f"Deleting {roomDb}")
-            if(roomDb.initiator == session['roomId']):
-                roomDb.initiator = None
-            if(roomDb.receiver == session['roomId'] and roomDb.initiator == None):
-                database.session.delete(roomDb)
-            database.session.commit()
-            session['roomId'] = None
         del userCalls[request.sid] #delete element from dictionary
 
 @socketio.on("transfer")
