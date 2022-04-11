@@ -48,6 +48,7 @@ def landing():
                         room.initiator = session['username']
                         database.session.commit()
                         session['roomId'] = room.roomId
+                        print(session['roomId'])
                         foundRoom = True
                 searchRange += 1
 
