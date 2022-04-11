@@ -20,6 +20,7 @@ def landing():
         language = request.form['language']
 
         user = User.query.filter_by(username=session['username']).first()
+        session['roomId'] = None
 
         # Check to see if user is already in a room
         checkRoom = Room.query.filter((Room.initiator == user.username) | (Room.receiver == user.username)).first()
