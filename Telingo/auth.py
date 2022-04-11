@@ -1,6 +1,6 @@
 from calendar import day_abbr
 import functools
-from multiprocessing.reduction import duplicate
+#from multiprocessing.reduction import duplicate
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
 
@@ -9,7 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .db import Language, database, User
 
 #
-# Any routes that begin with /auth will be sent here 
+# Any routes that begin with /auth will be sent here
 #
 
 auth = Blueprint("auth", __name__, url_prefix='/auth')
@@ -18,7 +18,7 @@ auth = Blueprint("auth", __name__, url_prefix='/auth')
 
 #
 # This route will allow users to create an account
-# Flashes an error if a field is not complete or username 
+# Flashes an error if a field is not complete or username
 # already exists
 #
 
@@ -29,14 +29,14 @@ def register():
         new_password = request.form['password']
         new_native_lang = request.form['native_lang']
         new_language = request.form['language']
-        
+
         error = None
 
         if not new_username:
             error = 'Username is required.'
         elif not new_password:
-            error = 'Password is required.'        
-        
+            error = 'Password is required.'
+
 
 
             #if username already exists in database
@@ -44,9 +44,9 @@ def register():
             error = 'Username already exists.'
 
         if error is None:
-            # ToDo:                
+            # ToDo:
                 # add error message
-                # Need to set uId to a new number every time                
+                # Need to set uId to a new number every time
 
 
             # #add user to database
@@ -70,7 +70,7 @@ def register():
                 user = User(uId=0, username=new_username, password=generate_password_hash(new_password), report_status=0, ban_status=0, native_lang=new_native_lang)
             else:
                 user = User(uId=userId.uId + 1, username=new_username, password=generate_password_hash(new_password), report_status=0, ban_status=0, native_lang=new_native_lang)
-           
+
             language = Language(language=new_language, fluency=0)
             user.languages.append(language)
 
@@ -96,21 +96,21 @@ def login():
         username = request.form['username']
         password = request.form['password']
         # Get the database
-        
-        user = User.query.filter_by(username = username).first()      
+
+        user = User.query.filter_by(username = username).first()
         error = None
 
         # Check username is in the databse
         # if not set error = "Incorrect Username or Password"
         if not user:
-            return render_template('login.html', loginFailed = True)   
+            return render_template('login.html', loginFailed = True)
 
         # Check hashed password to matching username
         # if wrong set error = "Incorrect Username or Password"
         if check_password_hash(user.password, password):
             session["name"] = username
             return redirect(url_for('home.index'))
-        
+
         return render_template('auth/login.html', loginFailed = True)
 
     return render_template('auth/login.html')
@@ -119,8 +119,8 @@ def login():
         #   session.clear()
         #   session['user_id'] = USERID FROM DATABASE
         #   return redirect(url_for('index'))
-        
-        #flash(error)      
+
+        #flash(error)
 
 
 

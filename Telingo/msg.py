@@ -15,7 +15,7 @@ topics_f.close()
 @msg.route('/msg', methods=('GET', 'POST'))
 def landing():
     if request.method == 'POST':
-        #session['username'] = request.form['username'] #replace with loading user information or w/e
+        session['username'] = request.form['username'] #replace with loading user information or w/e
         target = request.form['target'] #will eventually replace with automated match based on preferences
         language = request.form['language']
 
@@ -40,15 +40,15 @@ def landing():
         foundRoom = False
 
         if(rooms is not None):
-            for room in rooms:
-                # Make this part of the query?
-                # Add searching for only your native speakers
-                if((room.fluency + searchRange == uLanguage.fluency or room.fluency - searchRange == uLanguage.fluency) and room.language == language and room.initiator == None):
-                    room.initiator = session['username']
-                    database.session.commit()
-                    foundRoom = True
-                else:
-                    searchRange += 1
+            while (not foundRoom and searchRange < 10): #change number if fluency range smaller
+                for room in rooms:
+                    # Make this part of the query?
+                    # Add searching for only your native speakers
+                    if((room.fluency + searchRange == uLanguage.fluency or room.fluency - searchRange == uLanguage.fluency) and room.language == language and room.initiator == None and not foundRoom):
+                        room.initiator = session['username']
+                        database.session.commit()
+                        foundRoom = True
+                searchRange += 1
 
         if(not foundRoom):
             roomId = Room.query.order_by(-Room.roomId).first()
@@ -58,7 +58,7 @@ def landing():
                 uRoom = Room(roomId=0, language=language, fluency=uLanguage.fluency, receiver=session['username'], initiator=None)
             else:
                 uRoom = Room(roomId=roomId.roomId + 1, language=language, fluency=uLanguage.fluency, receiver=session['username'], initiator=None)
-           
+
             database.session.add(uRoom)
             database.session.commit()
 
@@ -66,9 +66,9 @@ def landing():
         # Might not need this anymore
         res = make_response(redirect(url_for('msg.msgHolding')))
         if(foundRoom):
-            res.set_cookie(key="channel_info", value=session['username']+":"+target+":"+"initiator")
+            res.set_cookie(key="channel_info", value=session['username']+":"+"initiator")
         else:
-            res.set_cookie(key="channel_info", value=session['username']+":"+target+":"+"receiver")
+            res.set_cookie(key="channel_info", value=session['username']+":"+"receiver")
         return res #Redirect user to their conversation channel
     return render_template('messaging/message_landing.html')
 
@@ -99,11 +99,9 @@ def msgChannel():
     top2 = topics[rand+1]
     top3 = topics[rand+2]
     top4 = topics[rand+3]
-      
+
     room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
     if(room.initiator==session['username']):
         return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, user_room=room.roomId, identity="true", top1=top1, top2=top2, top3=top3, top4=top4)
     else:
         return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, user_room=room.roomId, identity="false", top1=top1, top2=top2, top3=top3, top4=top4)
-
-

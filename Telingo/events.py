@@ -1,12 +1,21 @@
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
-from flask import url_for, redirect, render_template
+from flask import url_for, request
 from . import socketio
 from .db import *
 
 #SocketIO Listeners
+userCalls = {} #Dictionary to map UserIDs to their active calls
 @socketio.on("FirstConnect")
 def testFunction(data):
-    print('recieved: ' + data['info']) #Can remove / replace with any first-connection function
+    print("User Joined: " + request.sid + " will be in room " + data['room'])
+    userCalls[request.sid] = data['room']
+
+#Will get called a while after the user disconnects
+@socketio.on("disconnect")
+def disconnectFunction():
+    print("User Left: " + request.sid)
+    print("Cleaning up " + userCalls[request.sid])
+    del userCalls[request.sid] #delete element from dictionary
 
 @socketio.on("transfer")
 def transfer(data):
@@ -44,3 +53,28 @@ def on_leave(data):
 def send_message(data):
     print('passing message')
     emit('Message', data, to=data['room'])
+
+#Dictionary Lookup
+@socketio.on("Dictionary")
+def search_term(data):
+    print('searching for term...')
+
+    #Set up request based on data passed
+    url = "https://lexicala1.p.rapidapi.com/search"
+    querystring = {"text":data['text'],"language":data['language']}
+    headers = {
+        "X-RapidAPI-Host": "lexicala1.p.rapidapi.com",
+        "X-RapidAPI-Key": ""
+    }
+
+    #Get result and convert into json format
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    dict = response.json()
+
+    #Check for no result
+    if dict.get('n_results') == 0:
+        emit('Dictionary-Response', {'text': "No Results Found"})
+        return
+    #Get result and send it
+    definition = dict.get('results')[0].get('senses')[0].get("definition")
+    emit('Dictionary-Response', {'text': definition})
