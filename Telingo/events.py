@@ -56,6 +56,19 @@ def send_message(data):
     print('passing message')
     emit('Message', data, to=data['room'])
 
+#Function to communicate that they are out of Ice candidates
+@socketio.on("outOfIce")
+def out_of_ice(data):
+    room = data['room']
+    print("User out of ICE candidates")
+    emit('noIce', to=room)
+
+@socketio.on("allOutOfIce")
+def sendTerminate(data):
+    print("All out of candidates, terminating call")
+    room = data['room']
+    emit('terminateNoIce', to=room)
+
 #Dictionary Lookup
 @socketio.on("Dictionary")
 def search_term(data):

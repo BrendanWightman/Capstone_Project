@@ -6,8 +6,12 @@ var sendChannel; // Local text
 var receiveChannel; // Remote text
 var localStream; // Local video + audio
 var remoteStream; // Remote video + audio
+// Variables for counting / making sure something doesn't happen twice
 var connectedCount = 0;
+var runOutCount = 0;
 var callStarted = false;
+var callInProgress = false;
+var alreadyEnded = false;
 var duplicateCatch = false;
 // Document Elements
 const messageInput = document.querySelector('input#message');
@@ -141,13 +145,14 @@ function setupListeners(){
       }
       else{
         console.log("we have run out of options");
-        // Initiate shutdown Sequence somehow
+        socket.emit('outOfIce', {room: (room_ID)});
       }
   });
 
   remoteConnection.addEventListener('connectionstatechange', event => {
       if (remoteConnection.connectionState === 'connected') {
         leaveButton.disabled=false;
+        callInProgress = true;
       }
       else if (remoteConnection.connectionState === 'disconnected'){
         closeCall();

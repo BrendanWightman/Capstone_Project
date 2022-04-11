@@ -100,6 +100,24 @@
     makeCall();
   });
 
+  socket.on('noIce', function(){
+    console.log("NO ICE");
+    if(runOutCount && !callInProgress){
+      socket.emit('allOutOfIce', {room: (room_ID)});
+    }
+    else{
+      runOutCount++;
+    }
+  })
+
+  socket.on('terminateNoIce', function(){
+    if(!alreadyEnded){
+      console.log("Terminating call from Ice Candidates")
+      alreadyEnded = true;
+      closeCall();
+    }
+  });
+
 // Other listeners:
  // Sends message if user presses 'enter' instead of 'send' button
   var input = document.getElementById("message");
