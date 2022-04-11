@@ -81,7 +81,6 @@
   socket.on('connect', function() {
       socket.emit('FirstConnect', {room: (room_ID)});
       getMicAndCam();
-      console.log(room_ID);
   });
 
   socket.on('transferPage', function(dest){
