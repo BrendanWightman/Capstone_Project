@@ -52,6 +52,7 @@ def sendStartMessage(data):
 @socketio.on('leave')
 def on_leave(data):
     room = data['room']
+    emit('transferPage', {'url':url_for('msg.landing')}, to=room)
     leave_room(room)
     print('leaving room: ' + room)
 
