@@ -16,16 +16,7 @@ def disconnectFunction():
     print("User Left: " + request.sid)
     if request.sid in userCalls:
         print("Cleaning up " + userCalls[request.sid])
-        # Delete entry in database
-        roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
-        if roomDb is not None:
-            print(f"Deleting {roomDb}")
-            if(roomDb.initiator == session['roomId']):
-                roomDb.initiator = None
-            if(roomDb.receiver == session['roomId'] and roomDb.initiator == None):
-                database.session.delete(roomDb)
-            database.session.commit()
-            session['roomId'] = None
+        emit('transferPage', url_for('msg.landing'), to=session['roomId'])
         del userCalls[request.sid] #delete element from dictionary
 
 @socketio.on("transfer")
@@ -51,6 +42,15 @@ def sendStartMessage(data):
 @socketio.on('leave')
 def on_leave(data):
     room = data['room']
+    # Delete entry in database
+    if room is not None:
+        print(f"Deleting {room}")
+        if(room.initiator == session['roomId']):
+            room.initiator = None
+        if(room.receiver == session['roomId'] and room.initiator == None):
+            database.session.delete(room)
+        database.session.commit()
+        session['roomId'] = None
     leave_room(room)
     print('leaving room: ' + room)
 
