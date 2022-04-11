@@ -4,10 +4,6 @@ from multiprocessing.reduction import duplicate
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
 from password_validation import PasswordPolicy
-
-
-
-
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .db import Admin, Language, database, User
@@ -35,17 +31,23 @@ def register():
         new_language = request.form['language']
         
         error = None
+        policy = PasswordPolicy()
 
         if not new_username:
             error = 'Username is required.'
         elif not new_password:
-            error = 'Password is required.'        
-        
+            error = 'Password is required.'           
 
+        elif not policy.validate(new_password):   #policy is 8 characters with at least 1 number. edited in policy.py.
+            for requirement in policy.test_password(new_password):
+                alert = f"{requirement.name} not satisfied: expected: {requirement.requirement}, got: {requirement.actual}"
+                flash(alert)
+                return redirect(url_for('auth.register'))           
 
             #if username already exists in database
         if database.session.query(database.exists().where(User.username == new_username)).scalar():
             error = 'Username already exists.'
+            return redirect(url_for('auth.login'))
 
         if error is None:
             # ToDo:                
@@ -132,7 +134,7 @@ def login():
 #
 
 @auth.route('/adminlogin', methods=('GET', 'POST'))
-def loggin():
+def adminlogin():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
