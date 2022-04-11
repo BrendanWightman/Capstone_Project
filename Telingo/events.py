@@ -1,4 +1,5 @@
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
+import requests, json
 from flask import url_for, request
 from . import socketio
 from .db import *
@@ -83,7 +84,7 @@ def search_term(data):
     }
 
     #Get result and convert into json format
-    response = request.requests("GET", url, headers=headers, params=querystring)
+    response = requests.request("GET", url, headers=headers, params=querystring)
     dict = response.json()
 
     #Check for no result
