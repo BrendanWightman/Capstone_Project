@@ -1,6 +1,6 @@
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
 import requests, json
-from flask import url_for, request
+from flask import url_for, request, session
 from . import socketio
 from .db import *
 
@@ -17,7 +17,6 @@ def disconnectFunction():
     # Delete entry in database
     roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
     print(session['roomId'])
-    emit('transferPage', url_for('msg.landing'), to=roomDb.roomId)
     if roomDb is not None:
         print(f"Deleting {roomDb}")
         if(roomDb.initiator == session['roomId']):
