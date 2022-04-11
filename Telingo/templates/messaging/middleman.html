@@ -35,18 +35,13 @@
     console.log("Maybe Starting");
     if(connectedCount){
       console.log("Giving Go-ahead");
-      //socket.emit('startCall', {room: (room_ID)});
-      socket.emit('transfer', {room:(room_ID), user:(username)});
+      socket.emit('transfer', {room:(room_ID)});
     }
     else{
       connectedCount++;
     }
   });
 
-  socket.on('startCall', function(){
-    //makeCall();
-    socket.emit('transfer', {room:(room_ID), user:(username)});
-  });
 
 // Other listeners:
 
