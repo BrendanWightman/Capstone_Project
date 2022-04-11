@@ -1,5 +1,6 @@
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
-from flask import url_for, request, session
+import requests, json
+from flask import url_for, request
 from . import socketio
 from .db import *
 
