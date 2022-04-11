@@ -1,5 +1,5 @@
 from flask_socketio import SocketIO, join_room, leave_room, send, emit
-from flask import url_for, request
+from flask import url_for, request, session
 from . import socketio
 from .db import *
 
@@ -11,12 +11,25 @@ def testFunction(data):
         print("User Joined: " + request.sid + " will be in room " + data['room'])
         userCalls[request.sid] = data['room']
 
-#Will get called a while after the user disconnects
 @socketio.on("disconnect")
 def disconnectFunction():
     print("User Left: " + request.sid)
     if request.sid in userCalls:
         print("Cleaning up " + userCalls[request.sid])
+        # Delete entry in database
+        roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
+        print(roomDb)
+        if roomDb is not None:
+            print(f"Deleting {roomDb}")
+            if(roomDb.roomId != session['username']):
+                print("Here!!!!")
+                #emit('transferPage', {'url':url_for('msg.landing')}, to=roomDb.roomId)
+            if(roomDb.initiator == session['roomId']):
+                roomDb.initiator = None
+            if(roomDb.receiver == session['roomId'] and roomDb.initiator == None):
+                database.session.delete(roomDb)
+            database.session.commit()
+            session['roomId'] = None
         del userCalls[request.sid] #delete element from dictionary
 
 @socketio.on("transfer")
@@ -43,11 +56,6 @@ def sendStartMessage(data):
 def on_leave(data):
     room = data['room']
     leave_room(room)
-
-    # Make sure this works later
-    roomDb = Room.query.filter_by(roomId=room)
-    if roomDb:
-        database.session.delete(roomDb)
     print('leaving room: ' + room)
 
 #Message Passer (Needed for Signaling Server)
