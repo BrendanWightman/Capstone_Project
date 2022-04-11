@@ -99,9 +99,17 @@ def msgChannel():
     top2 = topics[rand+1]
     top3 = topics[rand+2]
     top4 = topics[rand+3]
+    
+    shortLanguage = {
+        "French" : "fr",
+        "English" : "en",
+        "German" : "de",
+        "Japanese" : "ja",
+        "Spanish" : "es",
+    }
 
     room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
     if(room.initiator==session['username']):
-        return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, user_room=room.roomId, identity="true", top1=top1, top2=top2, top3=top3, top4=top4)
+        return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, language=shortLanguage[room.language], user_room=room.roomId, identity="true", top1=top1, top2=top2, top3=top3, top4=top4)
     else:
-        return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, user_room=room.roomId, identity="false", top1=top1, top2=top2, top3=top3, top4=top4)
+        return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, language=shortLanguage[room.language], user_room=room.roomId, identity="false", top1=top1, top2=top2, top3=top3, top4=top4)
