@@ -61,7 +61,6 @@
         </div>
     </div>
 
-
     <!-- Popup for mediad devices -->
     <div id="deviceNotif" class="modal" role="dialog" style="position:absolute; top:25%;">
 
@@ -69,6 +68,30 @@
       <div class="modal-content text-center">
         <div class="modal-body">
           <p>We could not detect a camera/microphone, please make sure your devices are plugged in properly.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Popup for Post-Call Report -->
+    <div id="userReport" class="modal" role="dialog" style="position:absolute; height:100vh; display:none;">
+
+      <!-- Modal content -->
+      <div class="modal-content text-center" style="height:100vh;">
+        <div class="modal-body" style="top:25%;">
+          <p>The Call has Ended</p>
+          <p>If the other user participated in any malicious behavior, please report them here:</p>
+          <form method="POST">
+            <select id="reports" name="ReportUser">
+              <option value=0 selected>No malicious behavior</option>
+              <option value=1>Inaccurate Declared Skill Level</option>
+              <option value=2>Minor Malicious Behavior (rude speech, etc.)</option>
+              <option value=3>Major Malicious Behavior (harassment, racism, etc.)</option>
+            </select>
+            <input type="submit" name="Submit and Close Call">
+            <input type="hidden" name="user" value="{{user}}"></input>
+            <input type="hidden" name="target" value="{{target}}"></input>
+          </form>
         </div>
       </div>
 
@@ -121,7 +144,6 @@
   });
 
   function endFromIceTerminate(){
-    console.log("Looking to terminate..." + " callInProgress is: " + callInProgress);
     if(!alreadyEnded && !callInProgress){
       console.log("Terminating call from Ice Candidates");
       alreadyEnded = true;

@@ -24,6 +24,7 @@ const closeButton = document.querySelector('button#disconnect');
 const localVideo = document.querySelector('video#localVideo');
 const remoteVideo = document.querySelector('video#remoteVideo');
 const deviceModal = document.querySelector('div#deviceNotif');
+const reportModal = document.querySelector('div#userReport');
 const leaveButton = document.querySelector('button#endCall');
 // Bind Buttons to functions
 //closeButton.onclick = terminateConnection; <- Needs function implemented first
@@ -235,4 +236,5 @@ function closeCall(){
   console.log("They left D:<");
   leaveButton.disabled=true;
   remoteConnection.close();
+  reportModal.style.display = "block"; // Display report Modal
 }
