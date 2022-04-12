@@ -13,5 +13,6 @@ setup(
         'flask', 
         'flask_sqlalchemy',
         'python-dotenv',
+        'password_validation'
     ],
 )
