@@ -2,10 +2,10 @@ from flask_sqlalchemy import SQLAlchemy
 
 # The rest of the initilization is in __init__.py
 database = SQLAlchemy()
-
+    
 class User(database.Model):
-    username  = database.Column(database.String(50), primary_key = True, unique=True,nullable = False)
-    uId  = database.Column(database.Integer, nullable = False)
+    uId  = database.Column(database.Integer, primary_key = True,  nullable = False)
+    username  = database.Column(database.String(50), unique=True,nullable = False)
     password  = database.Column(database.String(200),nullable = True)
     native_lang = database.Column(database.String(50))
     report_status = database.Column(database.Integer)
@@ -17,7 +17,7 @@ class User(database.Model):
 class Language(database.Model):
     uId  = database.Column(database.Integer, database.ForeignKey('user.uId'), nullable = False, primary_key = True,)
     language = database.Column(database.String(50), primary_key = True)
-    fluency = database.Column(database.Integer)
+    fluency = database.Column(database.Integer)   
 
 # Example of a language query
 # Language.query.with_parent(user).filter(Language.language == 'French').all()

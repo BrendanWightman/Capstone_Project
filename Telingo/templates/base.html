@@ -12,11 +12,11 @@
 
     {%block bodyStyle%} <body> {% endblock %}
         <nav class="navbar navbar-light navbar-expand-lg navigation-clean-button">
-            <div class="container"><a class="navbar-brand" href="#">Telingo</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="container"><a class="navbar-brand" href="{{url_for('home.index')}}">Telingo</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navcol-1">
                     <ul class="navbar-nav me-auto">
                         <!-- set correct active status with nav_item -->
-                        <li class="nav-item"><a class="nav-link {% block nav_item_home %}{% endblock %}" href="#">Home</a></li>
+                        <li class="nav-item"><a class="nav-link {% block nav_item_home %}{% endblock %}" href="{{url_for('home.index')}}">Home</a></li>
                         <li class="nav-item"><a class="nav-link {% block nav_item_two %}{% endblock %}" href="#">Second Item</a></li>
                         <li class="nav-item dropdown"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">Dropdown </a>
                             <div class="dropdown-menu"><a class="dropdown-item" href="#">First Item</a><a class="dropdown-item" href="#">Second Item</a><a class="dropdown-item" href="#">Third Item</a></div>
@@ -25,7 +25,7 @@
                         {% if g.user %}
                             <a class="profile" href="{{ url_for('auth.logout') }}">Log Out</a>
                             <a class="btn btn-light action-button" role="button" href="{{url_for('profile', username=g.user['username'])}}">Profile</a>
-                        {% else %}
+                        {% else %} 
                             <a class="login" href="{{ url_for('auth.login') }}">Log In</a>
                             <a class="btn btn-light action-button" role="button" href="{{ url_for('auth.register') }}">Sign Up</a>
                         {% endif %}

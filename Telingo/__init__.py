@@ -15,6 +15,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
     #
+
     # When ready to deploy https://flask.palletsprojects.com/en/2.0.x/tutorial/deploy/
     # MAKE SURE TO CHANGE THIS
     #
@@ -33,6 +34,7 @@ def create_app(test_config=None):
     database.app = app
     database.init_app(app)
     database.create_all()
+
 
     # ensure the instance folder exists
     try:
@@ -53,3 +55,4 @@ def create_app(test_config=None):
 
 def page_not_found(e):
   return render_template('404.html'), 404
+

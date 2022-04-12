@@ -154,5 +154,12 @@ cython_debug/
 # Database files
 *.db
 Telingo/Telingo.db
-Telingo/TempAlgorithm.py
+.vscode/settings.json
+.idea/Capstone_Project.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/vcs.xml
+
 
