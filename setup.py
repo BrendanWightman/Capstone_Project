@@ -1,5 +1,8 @@
 from setuptools import find_packages, setup
 
+# To use
+# pip install -e .
+
 setup(
     name='Telingo',
     version='1.0.0',
@@ -7,6 +10,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'flask',
+        'flask', 
+        'flask_sqlalchemy',
+        'python-dotenv',
     ],
 )

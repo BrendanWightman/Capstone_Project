@@ -1,12 +1,15 @@
 import os
 
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
 from . import auth
 from . import home
+from .db import database
 
 def create_app(test_config=None):
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
+    app.config.from_object('config')
     
     # 
     # When ready to deploy https://flask.palletsprojects.com/en/2.0.x/tutorial/deploy/
@@ -14,7 +17,12 @@ def create_app(test_config=None):
     #
     app.secret_key = 'dev'
 
-    app.config.from_pyfile('config.py', silent=True)
+    
+    # Modular way to initialize the database
+    database.app = app
+    database.init_app(app)
+    database.create_all()
+
 
     # ensure the instance folder exists
     try:
