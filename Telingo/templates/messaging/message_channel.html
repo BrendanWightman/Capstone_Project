@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block bodyStyle %} <body style="width: 1080px;height: 1920px;"> {% endblock %}
+
+{% block content %}
+
+<!--Setup (Socketio, adapter, and variables) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+<script type="text/javascript" src="../../static/js/adapter.js"></script>
+<script type="text/javascript" charset="utf-8">
+  // Set up variables based on sent parameters
+    var username = "{{user}}"
+    var target = "{{target}}"
+    var room_ID = "{{user_room}}"
+    var language = "{{language}}"
+    var initiator = {{identity}} //True = Initiator, False = Reciever
+    var socket = io();
+
+    window.addEventListener('beforeunload', function (e) {
+      e.preventDefault();
+      e.returnValue = '';
+    });
+</script>
+
+<h1>Video call</h1>
+    <div class="row">
+        <div class="col" style="position:relative;">
+          <video id="remoteVideo" width="100%" height="100%" autoplay playsinline style="position:absolute; right:0px; bottom:0px;"></video>
+          <video id="localVideo" width="30%" height="30%" muted="true" autoplay playsinline style="position:absolute; right:15px; bottom:0px;"></video>
+        </div>
+        <div class="col">
+            <div class="table-responsive" style="display: inline;" >
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="1" colspan="1">Chat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="text_chat" style="overflow: scroll; display:block; height:200px;">
+                      <tr><td><i>Remember to be polite and that any inappropriate behavior is a bannable offense!</i></td></tr>
+                    </tbody>
+                </table>
+            </div><input type="text" id="message" name="message" disabled><button type="button" id="send" disabled>Send</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+          <div class="row">
+            <div class="col-8">
+              <h1 class="fs-3">Conversation Topics</h1>
+              <p>{{top1}}<br>{{top2}}<br>{{top3}}<br>{{top4}}</p>
+            </div>
+            <div class="col" style="position:relative;">
+                <button type="button" id="endCall" style="position:absolute; top:5px; right:20px;" disabled>Leave Call</button>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+            <h1 class="fs-3">Dictionary Lookup</h1>
+            <p id="definition"></p>
+            <input type="text" id="search" name="search"><button type="button" id="lookup">Lookup</button>
+        </div>
+    </div>
+
+    <!-- Popup for mediad devices -->
+    <div id="deviceNotif" class="modal" role="dialog" style="position:absolute; top:25%;">
+
+      <!-- Modal content -->
+      <div class="modal-content text-center">
+        <div class="modal-body">
+          <p>We could not detect a camera/microphone, please make sure your devices are plugged in properly.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Popup for Post-Call Report -->
+    <div id="userReport" class="modal" role="dialog" style="position:absolute; height:100vh; display:none;">
+
+      <!-- Modal content -->
+      <div class="modal-content text-center" style="height:100vh;">
+        <div class="modal-body" style="top:25%;">
+          <p>The Call has Ended</p>
+          <p>If the other user participated in any malicious behavior, please report them here:</p>
+          <form method="POST">
+            <select id="reports" name="ReportUser">
+              <option value=0 selected>No malicious behavior</option>
+              <option value=1>Inaccurate Declared Skill Level</option>
+              <option value=2>Minor Malicious Behavior (rude speech, etc.)</option>
+              <option value=3>Major Malicious Behavior (harassment, racism, etc.)</option>
+            </select>
+            <input type="submit" name="Submit and Close Call">
+            <input type="hidden" name="user" value="{{user}}"></input>
+            <input type="hidden" name="target" value="{{target}}"></input>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+<!--Javascript Functionality (ORDER MATTERS)-->
+<script type="text/javascript" src="../../static/js/messaging.js"></script>
+<script type="text/javascript" charset="utf-8">
+// Socket Listeners (Maybe move into JS file?)
+  socket.on('connect', function() {
+      socket.emit('FirstConnect', {room: (room_ID)});
+      getMicAndCam();
+  });
+
+  socket.on('transferPage', function(dest){
+    console.log("Transfering pages...");
+    //socket.emit('leave', {room:(room_ID)});
+    window.location.replace(dest);
+});
+
+ // Listeners to ensure connection sequence does not start until both on webpage
+  socket.on('maybeStart', function(){
+    console.log("Maybe Starting");
+    if(connectedCount){
+      console.log("Giving Go-ahead");
+      socket.emit('startCall', {room: (room_ID)});
+    }
+    else{
+      connectedCount++;
+    }
+  });
+
+  socket.on('startCall', function(){
+    makeCall();
+  });
+
+  socket.on('noIce', function(){
+    console.log("NO ICE");
+    if(runOutCount && !callInProgress){
+      socket.emit('allOutOfIce', {room: (room_ID)});
+    }
+    else{
+      runOutCount++;
+    }
+  })
+
+  socket.on('terminateNoIce', function(){
+    console.log("Got terminate notice");
+    window.setTimeout(endFromIceTerminate, 30000); //Give 1 minute to connect before trying
+  });
+
+  function endFromIceTerminate(){
+    if(!alreadyEnded && !callInProgress){
+      console.log("Terminating call from Ice Candidates");
+      alreadyEnded = true;
+      closeCall();
+    }
+  }
+
+// Other listeners:
+ // Sends message if user presses 'enter' instead of 'send' button
+  var input = document.getElementById("message");
+  input.addEventListener("keydown", function(e){
+    if (e.key === "Enter"){
+      sendMessage();
+    }
+  });
+  var dictLookup = document.getElementById("search");
+  dictLookup.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      dictSearch();
+    }
+  });
+</script>
+
+{% endblock%}

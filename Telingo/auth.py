@@ -1,6 +1,3 @@
-from calendar import day_abbr
-import functools
-from multiprocessing.reduction import duplicate
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for)
 from password_validation import PasswordPolicy
@@ -29,7 +26,6 @@ def register():
         new_password = request.form['password']
         new_native_lang = request.form['native_lang']
         new_language = request.form['language']
-        
         error = None
         policy = PasswordPolicy()
 
@@ -44,6 +40,7 @@ def register():
                 flash(alert)
                 return redirect(url_for('auth.register'))           
 
+
             #if username already exists in database
         if database.session.query(database.exists().where(User.username == new_username)).scalar():
             error = 'Username already exists.'
@@ -53,7 +50,6 @@ def register():
             # ToDo:                
                 # add error message
                 # Need to set uId to a new number every time                
-
 
             # #add user to database
             # user = User(uId=2, username=new_username,report_status=0,ban_status=0,native_lang=new_native_lang,language=new_language)
@@ -76,7 +72,8 @@ def register():
                 user = User(uId=0, username=new_username, password=generate_password_hash(new_password), report_status=0, ban_status=0, native_lang=new_native_lang)
             else:
                 user = User(uId=userId.uId + 1, username=new_username, password=generate_password_hash(new_password), report_status=0, ban_status=0, native_lang=new_native_lang)
-           
+
+
             language = Language(language=new_language, fluency=0)
             user.languages.append(language)
 
@@ -132,7 +129,6 @@ def login():
         #   session.clear()
         #   session['user_id'] = USERID FROM DATABASE
         #   return redirect(url_for('index'))
-        
         #flash(error)      
 
 
@@ -159,7 +155,6 @@ def adminlogin():
         return render_template('auth/adminlogin.html', loginFailed = True)
 
     return render_template('auth/adminlogin.html')     
-    
 
 
 #
@@ -199,3 +194,4 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+

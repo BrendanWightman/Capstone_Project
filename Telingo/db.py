@@ -24,11 +24,19 @@ class Language(database.Model):
 # Returns the results of "user's" Language where language = 'French'
 
 
+class Room(database.Model):
+    roomId = database.Column(database.Integer(), primary_key = True, unique=True)
+    language = database.Column(database.String(50))
+    initiator = database.Column(database.String(50), nullable = True) # Change to uId if we can figure it out
+    receiver = database.Column(database.String(50), nullable = False)
+
+    fluency = database.Column(database.Integer())
+
 #Reporting database
 class Report(database.Model):
-    report_id = database.Column(database.Integer, primary_key= True)
-    report_status = database.Column(database.Integer) 
-    reporter = database.Column(database.String(50)) 
+    report_id = database.Column(database.Integer, primary_key = True)
+    report_status = database.Column(database.Integer)
+    reporter = database.Column(database.String(50))
     reportee = database.Column(database.String(50))
 
 #Administrator
@@ -38,7 +46,3 @@ class Admin(database.Model):
     password  = database.Column(database.String(200))
     def __repr__(self):
         return '<Admin %r>' % self.username
-
-
-
-
