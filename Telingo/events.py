@@ -17,7 +17,6 @@ def disconnectFunction():
     # Delete entry in database
     roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
     print(session['roomId'])
-    emit('transferPage', url_for('msg.landing'), to=roomDb.roomId)
     if roomDb is not None:
         print(f"Deleting {roomDb}")
         if(roomDb.initiator == session['roomId']):

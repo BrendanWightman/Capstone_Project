@@ -90,30 +90,45 @@ def msgHolding():
 #Route for actual communication between users
 @msg.route('/channel', methods=('GET', 'POST'))
 def msgChannel():
+    if request.method == 'GET':
+        #Handle Cookies:
+        info = request.cookies.get('channel_info')
+        if not info:
+            #Add error message popup?
+            return redirect(url_for('msg.landing'))
 
-    #Handle Cookies:
-    info = request.cookies.get('channel_info')
-    if not info:
-        #Add error message popup?
-        return redirect(url_for('msg.landing'))
+        #Double check there isn't a more efficient way to do this
+        rand = random.randint(0, (len(topics)/4)-1) * 4
+        top1 = topics[rand]
+        top2 = topics[rand+1]
+        top3 = topics[rand+2]
+        top4 = topics[rand+3]
 
-    #Double check there isn't a more efficient way to do this
-    rand = random.randint(0, (len(topics)/4)-1) * 4
-    top1 = topics[rand]
-    top2 = topics[rand+1]
-    top3 = topics[rand+2]
-    top4 = topics[rand+3]
-    
-    shortLanguage = {
-        "French" : "fr",
-        "English" : "en",
-        "German" : "de",
-        "Japanese" : "ja",
-        "Spanish" : "es",
-    }
+        shortLanguage = {
+            "French" : "fr",
+            "English" : "en",
+            "German" : "de",
+            "Japanese" : "ja",
+            "Spanish" : "es",
+        }
 
-    room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
-    if(room.initiator==session['username']):
-        return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, language=shortLanguage[room.language], user_room=room.roomId, identity="true", top1=top1, top2=top2, top3=top3, top4=top4)
-    else:
-        return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, language=shortLanguage[room.language], user_room=room.roomId, identity="false", top1=top1, top2=top2, top3=top3, top4=top4)
+        room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
+        if(room.initiator==session['username']):
+            return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, language=shortLanguage[room.language], user_room=room.roomId, identity="true", top1=top1, top2=top2, top3=top3, top4=top4)
+        else:
+            return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, language=shortLanguage[room.language], user_room=room.roomId, identity="false", top1=top1, top2=top2, top3=top3, top4=top4)
+
+    elif request.method == 'POST':
+        print('We got a Post Method')
+        if(request.form['ReportUser'] != 0):
+            #Add report to database
+            reportGet = Report.query.order_by(-Report.report_id).first()
+            reportID = 0;
+            if reportGet:
+                reportID = reportGet.report_id + 1
+            newReport = Report(report_id = reportID, report_status = request.form['ReportUser'], reporter = request.form['user'], reportee = request.form['target'])
+            database.session.add(newReport)
+            database.session.commit()
+        else:
+            print('No Report Needed')
+        return make_response(redirect(url_for('msg.landing')))

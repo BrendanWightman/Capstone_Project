@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 # The rest of the initilization is in __init__.py
 database = SQLAlchemy()
-    
+
 class User(database.Model):
     username  = database.Column(database.String(50), primary_key = True, unique=True,nullable = False)
     uId  = database.Column(database.Integer, nullable = False)
@@ -17,7 +17,7 @@ class User(database.Model):
 class Language(database.Model):
     uId  = database.Column(database.Integer, database.ForeignKey('user.uId'), nullable = False, primary_key = True,)
     language = database.Column(database.String(50), primary_key = True)
-    fluency = database.Column(database.Integer)   
+    fluency = database.Column(database.Integer)
 
 # Example of a language query
 # Language.query.with_parent(user).filter(Language.language == 'French').all()
@@ -28,15 +28,16 @@ class Room(database.Model):
     roomId = database.Column(database.Integer(), primary_key = True, unique=True)
     language = database.Column(database.String(50))
     initiator = database.Column(database.String(50), nullable = True) # Change to uId if we can figure it out
-    receiver = database.Column(database.String(50), nullable = False) 
+    receiver = database.Column(database.String(50), nullable = False)
 
     fluency = database.Column(database.Integer())
-    
+
 #Reporting database
 class Report(database.Model):
-    report_status = database.Column(database.Integer, primary_key = True)
-    reporter = database.Column(database.Integer) 
-    reportee = database.Column(database.Integer)
+    report_id = database.Column(database.Integer, primary_key = True)
+    report_status = database.Column(database.Integer)
+    reporter = database.Column(database.String(50))
+    reportee = database.Column(database.String(50))
 
 #Administrator
 class Admin(database.Model):
@@ -44,4 +45,4 @@ class Admin(database.Model):
     unique_id = database.Column(database.Integer())
     password  = database.Column(database.String(200))
     def __repr__(self):
-        return '<Admin %r>' % self.username    
+        return '<Admin %r>' % self.username
