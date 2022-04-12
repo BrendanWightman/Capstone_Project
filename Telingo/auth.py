@@ -109,7 +109,14 @@ def login():
         # Check username is in the databse
         # if not set error = "Incorrect Username or Password"
         if not user:
-            return render_template('auth/login.html', loginFailed = True)   
+            return render_template('auth/login.html', loginFailed = True)  
+
+        # Check ban status of user
+        user = User.query.filter_by(username = username, ban_status = 0)
+        if database.session.query(database.exists().where(User.username == username and User.ban_status != 0)).scalar():
+            alert = 'Your account has been disabled.'
+            flash(alert)
+            return redirect(url_for('auth/login'))         
 
         # Check hashed password to matching username
         # if wrong set error = "Incorrect Username or Password"
@@ -153,7 +160,6 @@ def adminlogin():
 
     return render_template('auth/adminlogin.html')     
     
-
 
 
 #
