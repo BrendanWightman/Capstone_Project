@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% block content %}
 <!--Setup (Socketio, adapter, and variables) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script type="text/javascript" charset="utf-8">
@@ -11,7 +11,7 @@
     var socket = io();
 </script>
 
-{% block content %}
+
 <div class="container" style="text-align: center;">
     <div class="row">
         <div class="col">
@@ -22,8 +22,8 @@
         <div class="col"><span class="spinner-border spinner-border-sm" role="status" style="height: 42px;width: 42px;color: rgb(0,128,255);"></span></div>
     </div>
 </div>
-{% endblock%}
-  
+
+
 <!--Javascript Functionality (ORDER MATTERS)-->
 <script type="text/javascript" src="../../static/js/messaging.js"></script>
 <script type="text/javascript" charset="utf-8">
@@ -55,3 +55,4 @@ socket.on('transferPage', (dest) =>{
 });
 </script>
 </body>
+{% endblock%}

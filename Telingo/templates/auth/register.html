@@ -2,18 +2,21 @@
 {% block content %}
 
 <script>
-    var check = function() {
-  if (document.getElementById('password').value ==
-    document.getElementById('passwordConfirm').value) {
-    document.getElementById('message').style.color = 'green';
-    document.getElementById('message').innerHTML = 'Passwords Match';
-  } else if( document.getElementById('passwordConfirm').value == ''){
-    document.getElementById('message').innerHTML ='';
-  }else {
-    document.getElementById('message').style.color = 'red';
-    document.getElementById('message').innerHTML = 'Passwords Do Not Match';
-  }
-}
+    var check = function() { //Function for message + disable button when passwords to not match
+      if (document.getElementById('password').value ==
+        document.getElementById('passwordConfirm').value) {
+        document.getElementById('message').style.color = 'green';
+        document.getElementById('message').innerHTML = 'Passwords Match';
+        document.getElementById('submitButton').disabled=false;
+      } else if( document.getElementById('passwordConfirm').value == ''){
+        document.getElementById('message').innerHTML ='';
+        document.getElementById('submitButton').disabled=true;
+      } else {
+        document.getElementById('message').style.color = 'red';
+        document.getElementById('message').innerHTML = 'Passwords Do Not Match';
+        document.getElementById('submitButton').disabled=true;
+      }
+    }
 </script>
 
 
@@ -61,13 +64,13 @@
         </div>
         <div class="row text-center">
             <div class="col">
-                <label class="form-label">Native Language:</label>            
+                <label class="form-label">Native Language:</label>
                 <select name="native_lang" class="form-select w-auto mx-auto" aria-label=".form-select-sm">
                 <option value="English">English</option>
                 <option value="Japanese">Japanese</option>
                 <option value="German">German</option>
                 <option value="French">French</option>
-                <option value="Spanish">Spanish</option> 
+                <option value="Spanish">Spanish</option>
             </select>
                 <div class="row">
                     <div class="col">
@@ -78,13 +81,13 @@
         </div>
         <div class="row text-center">
             <div class="col">
-                <label class="form-label">Language You Want To Learn:</label>            
+                <label class="form-label">Language You Want To Learn:</label>
                 <select name="language" class="form-select w-auto mx-auto" aria-label=".form-select-sm example">
                 <option value="English">English</option>
                 <option value="Japanese">Japanese</option>
                 <option value="German">German</option>
                 <option value="French">French</option>
-                <option value="Spanish">Spanish</option> 
+                <option value="Spanish">Spanish</option>
             </select>
                 <div class="row">
                     <div class="col">
@@ -95,7 +98,7 @@
         </div>
         <div class="row">
             <div class="col text-center">
-                <button class="btn btn-primary" type="submit">Create Account</button>
+                <button id="submitButton" class="btn btn-primary" type="submit">Create Account</button>
             </div>
         </div>
     </form>
