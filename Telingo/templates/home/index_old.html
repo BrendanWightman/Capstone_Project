@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block bodyStyle %} <body style="width: 1080px;height: 1920px;"> {% endblock %}
+
+{% block content %}
+<h1>Video call</h1>
+    <div class="row">
+        <div class="col"><img class="border rounded-0" src="/static/assets/img/WebRTC-740-fi.png" width="500" height="281.25"></div>
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="1" colspan="1">Chat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>chat message</td>
+                        </tr>
+                        <tr>
+                            <td>chat message</td>
+                        </tr>
+                        <tr>
+                            <td>chat message</td>
+                        </tr>
+                        <tr>
+                            <td>chat message</td>
+                        </tr>
+                        <tr>
+                            <td>chat message</td>
+                        </tr>
+                        <tr>
+                            <td>chat message</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div><input type="text"><button type="button">Send</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h1 class="fs-3">Conversation Topics</h1>
+            <p>example topic<br>example topic<br>example topic<br>example topic</p>
+        </div>
+        <div class="col">
+            <h1 class="fs-3">Other user</h1>
+            <p>user info<br>user info<br>user info<br>user info</p>
+        </div>
+    </div>
+{% endblock%}

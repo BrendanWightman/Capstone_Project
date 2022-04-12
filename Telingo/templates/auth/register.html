@@ -1,32 +1,114 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Register{% endblock %}</h1>
-{% endblock %}
-
 {% block content %}
-  <form method="post">
-    <label for="username">Username</label>
-    <input name="username" id="username" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <label for="native_lang">Select your native language</label>
-    <select name="native_lang">
-      <option value="English">English</option>
-      <option value="Japanese">Japanese</option>
-      <option value="German">German</option>
-      <option value="French">French</option>
-      <option value="Spanish">Spanish</option>  
-  </select>
-    <label for="language">Select the language you'd like to learn</label>
-    <select name="language">
-      <option value="English">English</option>
-      <option value="Japanese">Japanese</option>
-      <option value="German">German</option>
-      <option value="French">French</option>
-      <option value="Spanish">Spanish</option>  
-  </select>  
-    <input type="submit" value="Register">
 
-  </form>
+<script>
+    var check = function() {
+  if (document.getElementById('password').value ==
+    document.getElementById('passwordConfirm').value) {
+    document.getElementById('message').style.color = 'green';
+    document.getElementById('message').innerHTML = 'Passwords Match';
+  } else if( document.getElementById('passwordConfirm').value == ''){
+    document.getElementById('message').innerHTML ='';
+  }else {
+    document.getElementById('message').style.color = 'red';
+    document.getElementById('message').innerHTML = 'Passwords Do Not Match';
+  }
+}
+</script>
+
+
+<div class="container">
+    <div class="row text-center">
+        <div class="col">
+            <h1>Telingo Registration</h1>
+            <div class="row">
+                <div class="col">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form method="post">
+    <div class="row">
+        <div class="col text-center">
+            <label class="form-label">Username:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</label><input type="text" placeholder="Username" name="username" id="username" required></div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p></p>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col"><label class="form-label">Password:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</label><input type="password" placeholder="Password" name="password" id="password" required>
+            <div class="row">
+                <div class="col">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col"><label class="form-label">Confirm Password:&nbsp; &nbsp; &nbsp;&nbsp;</label><input type="password" placeholder="Password" name="password" id="passwordConfirm" onkeyup='check();' required>
+            <div class="row">
+                <div class="col">
+                    <p><span id='message'></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col"><label class="form-label">Native Language:</label>            
+            <select name="native_lang" class="form-select w-auto mx-auto" aria-label=".form-select-sm">
+            <option value="English">English</option>
+            <option value="Japanese">Japanese</option>
+            <option value="German">German</option>
+            <option value="French">French</option>
+            <option value="Spanish">Spanish</option> 
+        </select>
+            <div class="row">
+                <div class="col">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col"><label class="form-label">Language You Want To Learn:</label>            
+            <select name="native_lang" class="form-select w-auto mx-auto" aria-label=".form-select-sm example">
+            <option value="English">English</option>
+            <option value="Japanese">Japanese</option>
+            <option value="German">German</option>
+            <option value="French">French</option>
+            <option value="Spanish">Spanish</option> 
+        </select>
+            <div class="row">
+                <div class="col">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-center">
+            <button class="btn btn-primary" type="submit">Create Account</button>
+        </div>
+    </div>
+</form>
+    <div class="row">
+        <div class="col">
+            <p></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p></p>
+        </div>
+    </div>
+    <div class="row g-0 text-center">
+        <div class="col text-center">
+            <p>Already have an account?&nbsp;</p><a href="{{url_for('auth.login')}}">Sign in</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
