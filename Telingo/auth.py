@@ -147,13 +147,13 @@ def adminlogin():
         error = None
 
         if not admin:
-            return render_template('auth/admin.html', loginFailed=True)
+            return render_template('auth/adminlogin.html', loginFailed=True)
 
         if check_password_hash(admin.password, password):
             session["username"] = username
-            return redirect(url_for('home.index'))
+            return redirect(url_for('auth.ban'))
 
-        return render_template('auth/adminlogin.html', loginFailed = True)
+        return render_template('auth/admin.html', loginFailed = True)
 
     return render_template('auth/adminlogin.html')
 
