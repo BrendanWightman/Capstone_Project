@@ -162,7 +162,7 @@ def msgChannel():
         if(request.form['ReportUser'] != 0):
             #Add report to database
             reportGet = Report.query.order_by(-Report.report_id).first()
-            reportID = 0;
+            reportID = 0
             if reportGet:
                 reportID = reportGet.report_id + 1
             newReport = Report(report_id = reportID, report_status = request.form['ReportUser'], reporter = request.form['user'], reportee = request.form['target'])
