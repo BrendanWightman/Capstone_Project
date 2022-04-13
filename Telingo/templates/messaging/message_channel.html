@@ -16,7 +16,9 @@
     var socket = io();
 
     window.addEventListener('beforeunload', function (e) {
-      e.preventDefault();
+      if(!cleanExit){
+        e.preventDefault();
+      }
       e.returnValue = '';
     });
 </script>
