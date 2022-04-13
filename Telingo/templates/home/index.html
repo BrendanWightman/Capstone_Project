@@ -27,7 +27,7 @@
     </div>
     <div class="row">
         <div class="col" style="text-align: center;">
-            {% if g.user %}
+            {% if session['username'] %}
                 <form action={{url_for('msg.landing')}}>
                     <button class="btn btn-primary" type="submit">Get Started</button>
                 </form>
@@ -35,7 +35,7 @@
                 <form action={{url_for('auth.login')}}>
                     <button class="btn btn-primary" type="submit">Get Started</button>
                 </form>
-             {% endif %}
+            {% endif %}
         </div>
     </div>
 </div>

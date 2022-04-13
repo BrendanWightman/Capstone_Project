@@ -14,4 +14,6 @@ def index():
 @home.route('/profile/<username>')
 @login_required
 def profile(username):
+    if not ('username' in session): #If not logged in, send to login page
+        return make_response(redirect(url_for('auth.login')))
     return render_template('home/profile.html')

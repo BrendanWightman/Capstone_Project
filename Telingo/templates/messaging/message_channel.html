@@ -147,6 +147,7 @@
     if(!alreadyEnded && !callInProgress){
       console.log("Terminating call from Ice Candidates");
       alreadyEnded = true;
+      iceClose = true;
       closeCall();
     }
   }
