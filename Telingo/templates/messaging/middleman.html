@@ -50,10 +50,10 @@
 // Other listeners:
 socket.on('transferPage', (dest) =>{
   socket.emit("cleanExistence");
-  window.setTimeout(leavePage, 5000, dest);
+  window.setTimeout(leavePage, 5000, dest); //Delay five seconds to avoid race condition possibility
 });
 
-function leavePage(dest){
+function leavePage(dest){ //Redirect
   window.location.replace(dest);
 }
 </script>

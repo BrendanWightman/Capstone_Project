@@ -15,6 +15,7 @@
     var initiator = {{identity}} //True = Initiator, False = Reciever
     var socket = io();
 
+  // Event for when the window closes, should deter accidentally closing out
     window.addEventListener('beforeunload', function (e) {
       if(!cleanExit){
         e.preventDefault();
@@ -63,7 +64,7 @@
         </div>
     </div>
 
-    <!-- Popup for mediad devices -->
+    <!-- Popup for media devices -->
     <div id="deviceNotif" class="modal" role="dialog" style="position:absolute; top:25%;">
 
       <!-- Modal content -->
@@ -107,16 +108,10 @@
       getMicAndCam();
   });
 
-  socket.on('transferPage', function(dest){
-    console.log("Transfering pages...");
-    //socket.emit('leave', {room:(room_ID)});
-    window.location.replace(dest);
-});
-
  // Listeners to ensure connection sequence does not start until both on webpage
   socket.on('maybeStart', function(){
     console.log("Maybe Starting");
-    if(connectedCount){
+    if(connectedCount){ // If both connected + ready, initiate
       console.log("Giving Go-ahead");
       socket.emit('startCall', {room: (room_ID)});
     }
@@ -129,9 +124,9 @@
     makeCall();
   });
 
-  socket.on('noIce', function(){
+  socket.on('noIce', function(){ // Once we run out of Ice candidates...
     console.log("NO ICE");
-    if(runOutCount && !callInProgress){
+    if(runOutCount && !callInProgress){ // If both out of ice + not in call, emit
       socket.emit('allOutOfIce', {room: (room_ID)});
     }
     else{
@@ -139,11 +134,13 @@
     }
   })
 
+ // Both out of ice means we may need to terminate the call...
   socket.on('terminateNoIce', function(){
     console.log("Got terminate notice");
-    window.setTimeout(endFromIceTerminate, 30000); //Give 1 minute to connect before trying
+    window.setTimeout(endFromIceTerminate, 30000); //Give 30 seconds to connect before trying
   });
 
+ //Terminate call since we can't connect
   function endFromIceTerminate(){
     if(!alreadyEnded && !callInProgress){
       console.log("Terminating call from Ice Candidates");
@@ -161,6 +158,7 @@
       sendMessage();
     }
   });
+ // Searches Dictionary if user presses 'enter' instead of button
   var dictLookup = document.getElementById("search");
   dictLookup.addEventListener("keydown", function(e){
     if(e.key === "Enter"){

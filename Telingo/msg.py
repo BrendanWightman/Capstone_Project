@@ -86,6 +86,7 @@ def msgHolding():
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
 
+    #load room info and send to corresponding page
     room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
     if(room.initiator==session['username']):
         return render_template('messaging/middleman.html', user=session['username'],target=room.receiver, user_room=room.roomId, identity="true")
@@ -106,13 +107,14 @@ def msgChannel():
             #Add error message popup?
             return redirect(url_for('msg.landing'))
 
-        #Double check there isn't a more efficient way to do this
+        #Generate topic suggestions based on random number
         rand = random.randint(0, (len(topics)/4)-1) * 4
         top1 = topics[rand]
         top2 = topics[rand+1]
         top3 = topics[rand+2]
         top4 = topics[rand+3]
 
+        #Languages map for dictionary API
         shortLanguage = {
             "French" : "fr",
             "English" : "en",
@@ -121,6 +123,7 @@ def msgChannel():
             "Spanish" : "es",
         }
 
+        #First load room data + store for use
         room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
         language = shortLanguage[room.language]
         user_room=room.roomId
@@ -131,7 +134,7 @@ def msgChannel():
             target=room.initiator
             identity="false"
 
-        #Delete Condition:
+        #If flagged, delete | otherwise, set flag for other user to delete
         if room.already_deleted:
             database.session.delete(room)
             database.session.commit()
@@ -139,6 +142,7 @@ def msgChannel():
             room.already_deleted = True;
             database.session.commit()
 
+        #Use saved data to render template
         return render_template('messaging/message_channel.html', user=session['username'],target=target, language=language, user_room=user_room, identity=identity, top1=top1, top2=top2, top3=top3, top4=top4)
 
     elif request.method == 'POST':
