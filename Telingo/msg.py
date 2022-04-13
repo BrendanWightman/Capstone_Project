@@ -18,12 +18,23 @@ def landing():
         return make_response(redirect(url_for('auth.login')))
 
     if request.method == 'POST':
-        session['username'] = request.form['username'] #replace with loading user information or w/e
-        target = request.form['target'] #will eventually replace with automated match based on preferences
+        #Pull language from form
         language = request.form['language']
 
+        #get user from table + reset roomId
         user = User.query.filter_by(username=session['username']).first()
         session['roomId'] = None
+
+        #If the user's language is declared, use their proficiency; otherwise use the one from the form
+        uLanguage = Language.query.with_parent(user).filter(Language.language == language).first()
+        if not uLanguage:
+            fluency = int(request.form['skillLevel'])
+        else:
+            fluency = uLanguage.fluency
+
+        #Debug Print
+        print("Matching a user in " + language + " with skill level: " + str(fluency))
+
 
         # Check to see if user is already in a room
         checkRoom = Room.query.filter((Room.initiator == user.username) | (Room.receiver == user.username)).first()
@@ -31,9 +42,7 @@ def landing():
             database.session.delete(checkRoom)
             database.session.commit()
 
-        uLanguage = Language.query.with_parent(user).filter(Language.language == language).first()
-
-        print(uLanguage.fluency)
+        print(fluency)
 
         rooms = Room.query.filter(Room.language == language).all()
 
@@ -43,12 +52,17 @@ def landing():
         searchRange = 0
         foundRoom = False
 
+        print(type(searchRange))
+        print(type(fluency))
+
         if(rooms is not None):
-            while (not foundRoom and searchRange < 10): #change number if fluency range smaller
+            print("Found Room for user")
+            while (not foundRoom and searchRange < 5): #change number if fluency range smaller
+                #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
                 for room in rooms:
                     # Make this part of the query?
                     # Add searching for only your native speakers
-                    if((room.fluency + searchRange == uLanguage.fluency or room.fluency - searchRange == uLanguage.fluency) and room.language == language and room.initiator == None and not foundRoom):
+                    if((room.fluency + searchRange == fluency or room.fluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundRoom):
                         room.initiator = session['username']
                         database.session.commit()
                         session['roomId'] = room.roomId
@@ -60,9 +74,9 @@ def landing():
 
             # Error checking if the query is empty
             if not roomId:
-                uRoom = Room(roomId=0, language=language, fluency=uLanguage.fluency, receiver=session['username'], initiator=None)
+                uRoom = Room(roomId=0, language=language, fluency=fluency, receiver=session['username'], initiator=None)
             else:
-                uRoom = Room(roomId=roomId.roomId + 1, language=language, fluency=uLanguage.fluency, receiver=session['username'], initiator=None)
+                uRoom = Room(roomId=roomId.roomId + 1, language=language, fluency=fluency, receiver=session['username'], initiator=None)
 
             session['roomId'] = uRoom.roomId
 
@@ -77,7 +91,7 @@ def landing():
         else:
             res.set_cookie(key="channel_info", value=session['username']+":"+"receiver")
         return res #Redirect user to their conversation channel
-    return render_template('messaging/message_landing.html')
+    return render_template('messaging/skillselect.html')
 
 
 # Loading room
@@ -125,6 +139,9 @@ def msgChannel():
 
         #First load room data + store for use
         room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
+        if not room: #If the room not found, some kind of error has occured so redirect to landing
+            return make_response(redirect(url_for('msg.landing')))
+
         language = shortLanguage[room.language]
         user_room=room.roomId
         if(room.initiator==session['username']):
