@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block bodyStyle %}{% endblock %}
+
+{% block nav_item_home %}active{% endblock %}
+
+{% block content %}
+    <div class="container" style="text-align: center;">
+        <div class="row">
+            <div class="col">
+                <h1 style="text-align: left;">{{user.username}}'s profile</h1>
+            </div>
+          <div class="col" style="text-align: right;width: 379px;">
+            <form action={{url_for('home.profile',username=user.username)}}>
+          		<button class="btn btn-primary" type="submit" style="text-align: right;">Cancel</button>
+        		</form>
+          </div>
+        </div>
+	<form method="post">
+        <div class="row">
+            <div class="col" style="text-align: center;">
+                <p>Native Language:</p>
+            <select name="new_native_lang" class="form-select w-auto mx-auto" aria-label=".form-select-sm">
+                <option value="English">English</option>
+                <option value="Japanese">Japanese</option>
+                <option value="German">German</option>
+                <option value="French">French</option>
+                <option value="Spanish">Spanish</option>
+            </select>
+                <div class="row">
+                    <div class="col">
+                        <p></p>
+                    </div>
+            </div>
+            </div>
+        </div>
+        <div class="row" style="width:50%; text-align:center; margin:auto;">
+          <p style="text-align: center;">Add / Update a Secondary Language:&nbsp;</p>
+            <div class="col" style="text-align: center; right:0;">
+		        <select name="edit_language" class="form-select mx-auto text-center" aria-label=".form-select-sm">
+                <option value="English">English</option>
+                <option value="Japanese">Japanese</option>
+                <option value="German">German</option>
+                <option value="French">French</option>
+                <option value="Spanish">Spanish</option>
+            </select>
+            </div>
+            <div class="col" style="text-align: center; left:0">
+            <select name="language_proficiency" class="form-select mx-auto text-center" aria-label=".form-select-sm">
+              <option value=0>Level 0</option>
+              <option value=1 selected>Level 1</option>
+              <option value=2>Level 2</option>
+              <option value=3>Level 3</option>
+              <option value=4>Level 4</option>
+              <option value=5>Level 5</option>
+            </select>
+            </div>
+            </div>
+        <div class="row">
+          <div class="col text-center">
+            <p></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col text-center">
+            <button class="btn btn-primary" type="submit">Save changes</button>
+          </div>
+        </div>
+	     </form>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+{% endblock%}
