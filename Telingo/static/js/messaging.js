@@ -13,6 +13,7 @@ var callStarted = false;
 var callInProgress = false;
 var alreadyEnded = false;
 var duplicateCatch = false;
+var iceClose = false;
 // Document Elements
 const messageInput = document.querySelector('input#message');
 const messageDisplay = document.querySelector('tbody#text_chat');
@@ -156,6 +157,7 @@ function setupListeners(){
         callInProgress = true;
       }
       else if (remoteConnection.connectionState === 'disconnected'){
+        uncleanClose = true;
         closeCall();
       }
   });
@@ -236,5 +238,10 @@ function closeCall(){
   console.log("They left D:<");
   leaveButton.disabled=true;
   remoteConnection.close();
-  reportModal.style.display = "block"; // Display report Modal
+  if(iceClose){ //If closed from ice, we don't want to show option to Report
+    window.location.replace("./msg");
+  }
+  else{
+    reportModal.style.display = "block"; // Display report Modal
+  }
 }

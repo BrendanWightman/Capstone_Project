@@ -14,6 +14,9 @@ topics_f.close()
 #Route for message landing page
 @msg.route('/msg', methods=('GET', 'POST'))
 def landing():
+    if not ('username' in session): #If not logged in, send to login page
+        return make_response(redirect(url_for('auth.login')))
+
     if request.method == 'POST':
         session['username'] = request.form['username'] #replace with loading user information or w/e
         target = request.form['target'] #will eventually replace with automated match based on preferences
@@ -80,6 +83,9 @@ def landing():
 # Loading room
 @msg.route('/holding', methods=('GET', 'POST'))
 def msgHolding():
+    if not ('username' in session): #If not logged in, send to login page
+        return make_response(redirect(url_for('auth.login')))
+
     room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
     if(room.initiator==session['username']):
         return render_template('messaging/middleman.html', user=session['username'],target=room.receiver, user_room=room.roomId, identity="true")
@@ -90,6 +96,9 @@ def msgHolding():
 #Route for actual communication between users
 @msg.route('/channel', methods=('GET', 'POST'))
 def msgChannel():
+    if not ('username' in session): #If not logged in, send to login page
+        return make_response(redirect(url_for('auth.login')))
+
     if request.method == 'GET':
         #Handle Cookies:
         info = request.cookies.get('channel_info')
