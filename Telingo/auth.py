@@ -158,6 +158,13 @@ def adminlogin():
     return render_template('auth/adminlogin.html')
 
 
+@auth.route('/admin', methods = ('GET','POST'))
+def ban():
+    if request.method == 'POST':
+        uID = session.get(uID)
+        user = User.query.filter_by(u)
+
+
 #
 # Before anything else is run this will run and check
 # if the user is logged in
