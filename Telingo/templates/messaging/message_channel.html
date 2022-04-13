@@ -18,8 +18,8 @@
     window.addEventListener('beforeunload', function (e) {
       if(!cleanExit){
         e.preventDefault();
+        e.returnValue = '';
       }
-      e.returnValue = '';
     });
 </script>
 
