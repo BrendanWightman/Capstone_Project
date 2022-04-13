@@ -52,7 +52,7 @@ def landing():
 
 
         if(rooms is not None):
-            while (not foundRoom and searchRange < 5): #change number if fluency range smaller
+            while (not foundRoom and searchRange < 6): #change number if fluency range smaller
                 #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
                 for room in rooms:
                     # Make this part of the query?
