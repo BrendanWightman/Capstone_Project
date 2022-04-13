@@ -161,6 +161,3 @@ Telingo/Telingo.db
 .idea/workspace.xml
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/vcs.xml
-
-# Python cache files
-*.cpython-38.pyc
