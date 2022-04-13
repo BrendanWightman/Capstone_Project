@@ -1,9 +1,42 @@
 {% extends 'base.html' %}
+{% block bodyStyle %}{% endblock %}
 
-{% block header %}
-  <h1>{% block title %}Profile{% endblock %}</h1>
-{% endblock %}
+{% block nav_item_home %}active{% endblock %}
 
 {% block content %}
-  This is the home of Telingo
-{% endblock %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>{{user.username}}'s profile</h1>
+            </div>
+            <div class="col" style="text-align: right;">
+        		<form action="{{url_for('home.profile',username=user.username)}}/edit">
+        			<button class="btn btn-primary" type="submit" style="text-align: right;">Edit</button>
+        		</form>
+        </div>
+        <div class="row">
+            <div class="col" style="text-align: center;">
+                <h4>Native Language: {{ user.native_lang }}</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+              <table class="table table-striped" style="width:75%; margin: auto;">
+                <tr>
+                  <th scope="col">Language</th>
+                  <th scope="col">Proficiency</th>
+                </tr>
+              {% for language in user.languages %}
+              <tr>
+                <td>{{ language.language }}</td>
+                <td>{{language.fluency}}</td>
+              </tr>
+              {% endfor %}
+            </table>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+{% endblock%}
