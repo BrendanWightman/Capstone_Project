@@ -151,7 +151,7 @@ def msgChannel():
             database.session.delete(room)
             database.session.commit()
         else:
-            room.already_deleted = True;
+            room.already_deleted = True
             database.session.commit()
 
         #Use saved data to render template
