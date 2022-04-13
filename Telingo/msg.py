@@ -52,11 +52,8 @@ def landing():
         searchRange = 0
         foundRoom = False
 
-        print(type(searchRange))
-        print(type(fluency))
 
         if(rooms is not None):
-            print("Found Room for user")
             while (not foundRoom and searchRange < 5): #change number if fluency range smaller
                 #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
                 for room in rooms:
