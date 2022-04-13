@@ -42,8 +42,6 @@ def landing():
             database.session.delete(checkRoom)
             database.session.commit()
 
-        print(fluency)
-
         rooms = Room.query.filter(Room.language == language).all()
 
         # if room exists that is same language, join room
