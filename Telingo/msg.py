@@ -18,29 +18,22 @@ def landing():
         return make_response(redirect(url_for('auth.login')))
 
     if request.method == 'POST':
-        #Pull language from form
+        session['username'] = request.form['username'] #replace with loading user information or w/e
+        target = request.form['target'] #will eventually replace with automated match based on preferences
         language = request.form['language']
 
-        #get user from table + reset roomId
         user = User.query.filter_by(username=session['username']).first()
         session['roomId'] = None
-
-        #If the user's language is declared, use their proficiency; otherwise use the one from the form
-        uLanguage = Language.query.with_parent(user).filter(Language.language == language).first()
-        if not uLanguage:
-            fluency = int(request.form['skillLevel'])
-        else:
-            fluency = uLanguage.fluency
-
-        #Debug Print
-        print("Matching a user in " + language + " with skill level: " + str(fluency))
-
 
         # Check to see if user is already in a room
         checkRoom = Room.query.filter((Room.initiator == user.username) | (Room.receiver == user.username)).first()
         if(checkRoom is not None):
             database.session.delete(checkRoom)
             database.session.commit()
+
+        uLanguage = Language.query.with_parent(user).filter(Language.language == language).first()
+
+        print(uLanguage.fluency)
 
         rooms = Room.query.filter(Room.language == language).all()
 
@@ -50,14 +43,12 @@ def landing():
         searchRange = 0
         foundRoom = False
 
-
         if(rooms is not None):
-            while (not foundRoom and searchRange < 5): #change number if fluency range smaller
-                #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
+            while (not foundRoom and searchRange < 10): #change number if fluency range smaller
                 for room in rooms:
                     # Make this part of the query?
                     # Add searching for only your native speakers
-                    if((room.fluency + searchRange == fluency or room.fluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundRoom):
+                    if((room.fluency + searchRange == uLanguage.fluency or room.fluency - searchRange == uLanguage.fluency) and room.language == language and room.initiator == None and not foundRoom):
                         room.initiator = session['username']
                         database.session.commit()
                         session['roomId'] = room.roomId
@@ -69,9 +60,9 @@ def landing():
 
             # Error checking if the query is empty
             if not roomId:
-                uRoom = Room(roomId=0, language=language, fluency=fluency, receiver=session['username'], initiator=None)
+                uRoom = Room(roomId=0, language=language, fluency=uLanguage.fluency, receiver=session['username'], initiator=None)
             else:
-                uRoom = Room(roomId=roomId.roomId + 1, language=language, fluency=fluency, receiver=session['username'], initiator=None)
+                uRoom = Room(roomId=roomId.roomId + 1, language=language, fluency=uLanguage.fluency, receiver=session['username'], initiator=None)
 
             session['roomId'] = uRoom.roomId
 
@@ -86,7 +77,7 @@ def landing():
         else:
             res.set_cookie(key="channel_info", value=session['username']+":"+"receiver")
         return res #Redirect user to their conversation channel
-    return render_template('messaging/skillselect.html')
+    return render_template('messaging/message_landing.html')
 
 
 # Loading room
@@ -95,7 +86,6 @@ def msgHolding():
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
 
-    #load room info and send to corresponding page
     room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
     if(room.initiator==session['username']):
         return render_template('messaging/middleman.html', user=session['username'],target=room.receiver, user_room=room.roomId, identity="true")
@@ -116,14 +106,13 @@ def msgChannel():
             #Add error message popup?
             return redirect(url_for('msg.landing'))
 
-        #Generate topic suggestions based on random number
+        #Double check there isn't a more efficient way to do this
         rand = random.randint(0, (len(topics)/4)-1) * 4
         top1 = topics[rand]
         top2 = topics[rand+1]
         top3 = topics[rand+2]
         top4 = topics[rand+3]
 
-        #Languages map for dictionary API
         shortLanguage = {
             "French" : "fr",
             "English" : "en",
@@ -132,30 +121,11 @@ def msgChannel():
             "Spanish" : "es",
         }
 
-        #First load room data + store for use
         room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
-        if not room: #If the room not found, some kind of error has occured so redirect to landing
-            return make_response(redirect(url_for('msg.landing')))
-
-        language = shortLanguage[room.language]
-        user_room=room.roomId
         if(room.initiator==session['username']):
-            target=room.receiver
-            identity="true"
+            return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, language=shortLanguage[room.language], user_room=room.roomId, identity="true", top1=top1, top2=top2, top3=top3, top4=top4)
         else:
-            target=room.initiator
-            identity="false"
-
-        #If flagged, delete | otherwise, set flag for other user to delete
-        if room.already_deleted:
-            database.session.delete(room)
-            database.session.commit()
-        else:
-            room.already_deleted = True;
-            database.session.commit()
-
-        #Use saved data to render template
-        return render_template('messaging/message_channel.html', user=session['username'],target=target, language=language, user_room=user_room, identity=identity, top1=top1, top2=top2, top3=top3, top4=top4)
+            return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, language=shortLanguage[room.language], user_room=room.roomId, identity="false", top1=top1, top2=top2, top3=top3, top4=top4)
 
     elif request.method == 'POST':
         print('We got a Post Method')

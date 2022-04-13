@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 # The rest of the initilization is in __init__.py
 database = SQLAlchemy()
-
+    
 class User(database.Model):
     uId  = database.Column(database.Integer, primary_key = True,  nullable = False)
     username  = database.Column(database.String(50), unique=True,nullable = False)
@@ -17,7 +17,7 @@ class User(database.Model):
 class Language(database.Model):
     uId  = database.Column(database.Integer, database.ForeignKey('user.uId'), nullable = False, primary_key = True,)
     language = database.Column(database.String(50), primary_key = True)
-    fluency = database.Column(database.Integer)
+    fluency = database.Column(database.Integer)   
 
 # Example of a language query
 # Language.query.with_parent(user).filter(Language.language == 'French').all()
@@ -29,8 +29,8 @@ class Room(database.Model):
     language = database.Column(database.String(50))
     initiator = database.Column(database.String(50), nullable = True) # Change to uId if we can figure it out
     receiver = database.Column(database.String(50), nullable = False)
+
     fluency = database.Column(database.Integer())
-    already_deleted = database.Column(database.Boolean(), default = False)
 
 #Reporting database
 class Report(database.Model):
@@ -41,8 +41,8 @@ class Report(database.Model):
 
 #Administrator
 class Admin(database.Model):
-    uId  = database.Column(database.Integer, primary_key = True,  nullable = False)
-    username = database.Column(database.Integer(), unique=True)
+    username = database.Column(database.Integer(), primary_key = True, unique=True)
+    unique_id = database.Column(database.Integer())
     password  = database.Column(database.String(200))
     def __repr__(self):
         return '<Admin %r>' % self.username

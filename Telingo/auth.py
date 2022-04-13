@@ -4,7 +4,7 @@ from flask import ( Blueprint, flash, g, redirect,
 from password_validation import PasswordPolicy
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .db import Admin, Language, database, User, Report
+from .db import Admin, Language, database, User
 
 #
 # Any routes that begin with /auth will be sent here
@@ -156,23 +156,6 @@ def adminlogin():
         return render_template('auth/adminlogin.html', loginFailed = True)
 
     return render_template('auth/adminlogin.html')
-
-
-@auth.route('/admin', methods = ('GET','POST'))
-def ban():
-    if request.method == 'GET':
-        users = Report.query.order_by(Report.report_id).all()
-        return render_template('auth/admin.html', users=users)
-    if request.method == 'POST':
-        username = request.form['username']
-        user = User.query.filter_by(username = username).first()
-        if user is not None:
-            user.ban_status = 1
-            database.session.commit()
-        else:
-            alert = 'User Does Not Exist'
-            flash(alert)
-    return redirect(url_for('auth.ban'))
 
 
 #

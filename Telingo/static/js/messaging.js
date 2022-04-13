@@ -6,34 +6,30 @@ var sendChannel; // Local text
 var receiveChannel; // Remote text
 var localStream; // Local video + audio
 var remoteStream; // Remote video + audio
-// Counters:
+// Variables for counting / making sure something doesn't happen twice
 var connectedCount = 0;
 var runOutCount = 0;
-// Flags:
 var callStarted = false;
 var callInProgress = false;
 var alreadyEnded = false;
-var duplicateCatch = false; // Prevents duplicate initiations on device-change
+var duplicateCatch = false;
 var iceClose = false;
 var cleanExit = false;
 // Document Elements
-// Text Chat ELements:
 const messageInput = document.querySelector('input#message');
 const messageDisplay = document.querySelector('tbody#text_chat');
 const sendButton = document.querySelector('button#send');
-//Dictionary Elements:
 const dictText = document.querySelector('input#search');
 const dictButton = document.querySelector('button#lookup');
 const dictResult = document.querySelector('p#definition');
-// Video Elements:
+const closeButton = document.querySelector('button#disconnect');
 const localVideo = document.querySelector('video#localVideo');
 const remoteVideo = document.querySelector('video#remoteVideo');
-// Popups:
 const deviceModal = document.querySelector('div#deviceNotif');
 const reportModal = document.querySelector('div#userReport');
-// Leave Call:
 const leaveButton = document.querySelector('button#endCall');
 // Bind Buttons to functions
+//closeButton.onclick = terminateConnection; <- Needs function implemented first
 sendButton.onclick = sendMessage;
 dictButton.onclick = dictSearch;
 leaveButton.onclick = closeCall;
@@ -48,7 +44,6 @@ const constraints ={
   'audio': true
 }
 
-// Initiator that gets media devices, first time it finds them -> start call initiation
 async function getMicAndCam(){
   navigator.mediaDevices.enumerateDevices()
     .then(devices => {
@@ -119,7 +114,7 @@ function preCallSetup(){
     .then(media=>{
       // All Video/Audio related setup
       localStream = media;
-      localVideo.srcObject = localStream; // Set up local video (muted so no audio)
+      localVideo.srcObject = localStream; // Set up local video
       localStream.getTracks().forEach(track => {
         remoteConnection.addTrack(track, localStream);
       });
@@ -157,7 +152,6 @@ function setupListeners(){
       }
   });
 
- // Track when we connect + disconnect
   remoteConnection.addEventListener('connectionstatechange', event => {
       if (remoteConnection.connectionState === 'connected') {
         leaveButton.disabled=false;
@@ -168,25 +162,23 @@ function setupListeners(){
       }
   });
 
- // Get the remote text channel
   remoteConnection.addEventListener('datachannel', event => {
     receiveChannel = event.channel;
     setupReceiveListeners();
   });
 
- // Get the remote video/audio tracks
   remoteConnection.addEventListener('track', async (event) => {
     remoteStream = event.streams;
     remoteVideo.srcObject = remoteStream[0];
   });
 
- // Enable textarea and button when channel opened
+  // Enable textarea and button when channel opened
   sendChannel.addEventListener('open', event => {
       messageInput.disabled = false;
       sendButton.disabled = false;
   });
 
- // Disable input when channel closed
+  // Disable input when channel closed
   sendChannel.addEventListener('close', event => {
       messageInput.disabled = true;
       sendButton.disabled = true;
@@ -195,7 +187,6 @@ function setupListeners(){
   console.log("setup listeners");
 }
 
-// Once we get the text channel, register an event for when data is sent across it
 function setupReceiveListeners(){
   receiveChannel.addEventListener('message', event => {
     console.log("Recieved Message");
