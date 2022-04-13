@@ -158,7 +158,6 @@ function setupListeners(){
         callInProgress = true;
       }
       else if (remoteConnection.connectionState === 'disconnected'){
-        uncleanClose = true;
         closeCall();
       }
   });
