@@ -163,4 +163,4 @@ Telingo/Telingo.db
 .idea/vcs.xml
 
 # Python cache files
-*.pyc
+*.cpython-38.pyc
