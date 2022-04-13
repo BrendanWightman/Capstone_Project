@@ -41,8 +41,8 @@ class Report(database.Model):
 
 #Administrator
 class Admin(database.Model):
-    username = database.Column(database.Integer(), primary_key = True, unique=True)
-    unique_id = database.Column(database.Integer())
+    uId  = database.Column(database.Integer, primary_key = True,  nullable = False)
+    username = database.Column(database.Integer(), unique=True)
     password  = database.Column(database.String(200))
     def __repr__(self):
         return '<Admin %r>' % self.username

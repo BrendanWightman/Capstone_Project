@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Admin Profile{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <div class="row text-center">
+    <div class="col">
+        <h1>Admin Ban Page</h1>
+        <div class="row">
+            <div class="col">
+                <p></p>
+            </div>
+        </div>
+    </div>
+  </div>
+  <form method="post">
+  <div class="row">
+      <div class="col text-center">
+          <input type="text" placeholder="Username" name="username" id="username" required>
+      </div>
+  </div>
+  <div class="row">
+      <div class="col">
+          <p></p>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col text-center"><button class="btn btn-primary" type="submit">Ban User</button></div>
+</div>
+<div class="row">
+  <div class="col">
+      <p></p>
+  </div>
+</div>
+  </form>
+  <table class="table table-striped" style="width:75%; margin: auto;">
+    <tr>
+      <th scope="col">Report ID</th>
+      <th scope="col">Report Status</th>
+      <th scope="col">Reporter</th>
+      <th scope="col">Reportee</th>
+    </tr>
+  {% for user in users %}
+  <tr>
+    <td>{{user.report_id}}</td>
+    <td>{{user.report_status}}</td>
+    <td>{{user.reporter}}</td>
+    <td>{{user.reportee}}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}
