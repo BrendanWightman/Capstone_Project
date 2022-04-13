@@ -14,6 +14,7 @@ var callInProgress = false;
 var alreadyEnded = false;
 var duplicateCatch = false;
 var iceClose = false;
+var cleanExit = false;
 // Document Elements
 const messageInput = document.querySelector('input#message');
 const messageDisplay = document.querySelector('tbody#text_chat');
@@ -235,6 +236,7 @@ socket.on('Dictionary-Response', function(data){
 
 // Function to execute once the call is closed
 function closeCall(){
+  cleanExit = true;
   console.log("They left D:<");
   leaveButton.disabled=true;
   remoteConnection.close();
