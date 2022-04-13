@@ -17,6 +17,7 @@ def index():
 def profile(username):
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
+
     user = User.query.filter_by(username = username).first()
     return render_template('home/profile.html', user=user)
 
@@ -24,16 +25,22 @@ def profile(username):
 def edit(username):
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
+
     user = User.query.filter_by(username = username).first()
     if request.method == 'POST':
-       new_native_lang = request.form['new_native_lang']
-       new_languages = request.form.getlist('new_languages')
-       user.native_lang = new_native_lang
-       Language.query.with_parent(user).filter().delete()
-       for language in new_languages:
-          new_language = Language(language=language, fluency=0)
-          user.languages.append(new_language)
-       database.session.commit()
-       return render_template('home/profile.html',user=user)
+        #Get form elements
+        new_native_lang = request.form['new_native_lang']
+        new_language = request.form['edit_language']
+        proficiency = int(request.form['language_proficiency'])
+
+        record = Language.query.with_parent(user).filter(Language.language == new_language).first()
+        if record: #If language already exists, just update proficiency
+            record.fluency = proficiency
+        else: #Otherwise, add new language
+            new_language_elem = Language(language=new_language, fluency=proficiency)
+            user.languages.append(new_language_elem)
+        #Commit and redirect
+        user.native_lang = new_native_lang
+        database.session.commit()
+        return render_template('home/profile.html',user=user)
     return render_template('home/profile_edit.html',user=user)
-	
