@@ -9,14 +9,6 @@
     var room_ID = "{{user_room}}"
     var initiator = {{identity}} //True = Initiator, False = Reciever
     var socket = io();
-    var cleanExit = false;
-
-    window.addEventListener('beforeunload', function (e) {
-      if(!cleanExit){
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    });
 </script>
 
 
@@ -37,7 +29,7 @@
 <script type="text/javascript" charset="utf-8">
 // Socket Listeners (Maybe move into JS file?)
   socket.on('connect', function() {
-      socket.emit('FirstConnect', {info: 'I\'m connected!'});
+      socket.emit('registerExistence');
       socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
        // Change conditions required for this to happen, likely through some kind of join-room event listener
   });
@@ -56,12 +48,14 @@
 
 
 // Other listeners:
-
 socket.on('transferPage', (dest) =>{
-  //socket.emit('leave', {room:(room_ID)});
-  cleanExit = true;
-  window.location.replace(dest);
+  socket.emit("cleanExistence");
+  window.setTimeout(leavePage, 5000, dest);
 });
+
+function leavePage(dest){
+  window.location.replace(dest);
+}
 </script>
 </body>
 {% endblock%}

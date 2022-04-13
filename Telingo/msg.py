@@ -122,10 +122,24 @@ def msgChannel():
         }
 
         room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
+        language = shortLanguage[room.language]
+        user_room=room.roomId
         if(room.initiator==session['username']):
-            return render_template('messaging/message_channel.html', user=session['username'],target=room.receiver, language=shortLanguage[room.language], user_room=room.roomId, identity="true", top1=top1, top2=top2, top3=top3, top4=top4)
+            target=room.receiver
+            identity="true"
         else:
-            return render_template('messaging/message_channel.html', user=session['username'],target=room.initiator, language=shortLanguage[room.language], user_room=room.roomId, identity="false", top1=top1, top2=top2, top3=top3, top4=top4)
+            target=room.initiator
+            identity="false"
+
+        #Delete Condition:
+        if room.already_deleted:
+            database.session.delete(room)
+            database.session.commit()
+        else:
+            room.already_deleted = True;
+            database.session.commit()
+
+        return render_template('messaging/message_channel.html', user=session['username'],target=target, language=language, user_room=user_room, identity=identity, top1=top1, top2=top2, top3=top3, top4=top4)
 
     elif request.method == 'POST':
         print('We got a Post Method')

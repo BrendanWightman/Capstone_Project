@@ -5,30 +5,27 @@ from . import socketio
 from .db import *
 
 #SocketIO Listeners
-userCalls = {} #Dictionary to map UserIDs to their active calls
-@socketio.on("FirstConnect")
-def testFunction(data):
-    if 'room' in data:
-        print("User Joined: " + request.sid + " will be in room " + data['room'])
-        userCalls[request.sid] = data['room']
+userQueue = {}
+@socketio.on("registerExistence")
+def registerInformation():
+    userQueue[request.sid] = True
+
+@socketio.on("cleanExistence")
+def registerInformation():
+    del userQueue[request.sid]
 
 @socketio.on("disconnect")
 def disconnectFunction():
-    # Delete entry in database
-    roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
-    print(session['roomId'])
-    if roomDb is not None:
-        print(f"Deleting {roomDb}")
-        if(roomDb.initiator == session['roomId']):
-            roomDb.initiator = None
-        if(roomDb.receiver == session['roomId'] and roomDb.initiator == None):
+    #Delete for unclean middleman leave:
+    if request.sid in userQueue:
+        roomDb =  Room.query.filter(Room.roomId == session['roomId']).first()
+        print(session['roomId'])
+        if roomDb is not None:
+            print(f"Deleting {roomDb} due to middleman leave")
             database.session.delete(roomDb)
-        database.session.commit()
+            database.session.commit()
         session['roomId'] = None
-    print("User Left: " + request.sid)
-    if request.sid in userCalls:
-        print("Cleaning up " + userCalls[request.sid])
-        del userCalls[request.sid] #delete element from dictionary
+        del userQueue[request.sid]
 
 @socketio.on("transfer")
 def transfer(data):

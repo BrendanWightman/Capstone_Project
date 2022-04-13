@@ -104,7 +104,6 @@
 <script type="text/javascript" charset="utf-8">
 // Socket Listeners (Maybe move into JS file?)
   socket.on('connect', function() {
-      socket.emit('FirstConnect', {room: (room_ID)});
       getMicAndCam();
   });
 
