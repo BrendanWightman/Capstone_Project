@@ -7,6 +7,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'flask', 'flask-socketio', 'eventlet'
+        'flask', 'flask-socketio', 'eventlet', 
+        'Password-Validation','python-dotenv',
+        'SQLAlchemy'
     ],
 )
