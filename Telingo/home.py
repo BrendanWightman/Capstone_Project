@@ -26,6 +26,9 @@ def edit(username):
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
 
+    if username != session['username']: #Prevent editing someone elses profile
+        return make_response(redirect(url_for('home.profile', username=username)))
+
     user = User.query.filter_by(username = username).first()
     if request.method == 'POST':
         #Get form elements
