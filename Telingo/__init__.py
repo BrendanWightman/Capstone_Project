@@ -1,8 +1,7 @@
 import os, requests, json
 
 from flask import Flask, render_template
-from flask_socketio import SocketIO, join_room, leave_room, send, emit
-from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO
 from . import auth
 from . import home
 from . import msg
@@ -14,16 +13,13 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
 
-    #
-
-    # When ready to deploy https://flask.palletsprojects.com/en/2.0.x/tutorial/deploy/
-    # MAKE SURE TO CHANGE THIS
-    #
+    # Change this for deployment to a random string
     app.secret_key = 'dev'
 
-    #app.config.from_pyfile('config.py', silent=True)
+    # Set configuations from config.py
     app.config.from_object('config')
 
+    # Change this for deployment
     app.debug = 'debug'
 
     # Intialize SocketIO
@@ -42,6 +38,8 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+
+    # Blueprint registration
     app.register_blueprint(auth.auth)
 
     app.register_blueprint(msg.msg)

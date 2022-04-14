@@ -27,7 +27,7 @@ class Language(database.Model):
 class Room(database.Model):
     roomId = database.Column(database.Integer(), primary_key = True, unique=True)
     language = database.Column(database.String(50))
-    initiator = database.Column(database.String(50), nullable = True) # Change to uId if we can figure it out
+    initiator = database.Column(database.String(50), nullable = True)
     receiver = database.Column(database.String(50), nullable = False)
     fluency = database.Column(database.Integer())
     already_deleted = database.Column(database.Boolean(), default = False)

@@ -50,13 +50,11 @@ def landing():
         searchRange = 0
         foundRoom = False
 
-
         if(rooms is not None):
             while (not foundRoom and searchRange < 6): #change number if fluency range smaller
                 #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
                 for room in rooms:
-                    # Make this part of the query?
-                    # Add searching for only your native speakers
+                    # search for room with fluency +/- searchRange and we haven't already found a room
                     if((room.fluency + searchRange == fluency or room.fluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundRoom):
                         room.initiator = session['username']
                         database.session.commit()
@@ -64,6 +62,7 @@ def landing():
                         foundRoom = True
                 searchRange += 1
 
+        # If we haven't found a room, create one
         if(not foundRoom):
             roomId = Room.query.order_by(-Room.roomId).first()
 

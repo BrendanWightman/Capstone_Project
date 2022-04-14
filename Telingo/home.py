@@ -2,7 +2,6 @@ from flask import (
     Blueprint, render_template, url_for, session, request, make_response, redirect
 )
 
-from Telingo.auth import login_required
 from .db import Admin, Language, database, User
 
 home = Blueprint("home", __name__)

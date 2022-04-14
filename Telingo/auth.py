@@ -1,4 +1,3 @@
-import functools
 from flask import ( Blueprint, flash, g, redirect,
  render_template, request, session, url_for, make_response)
 from password_validation import PasswordPolicy
@@ -134,7 +133,7 @@ def login():
 
 
 #
-#Admin Login page
+#Admin login page
 #
 
 @auth.route('/adminlogin', methods=('GET', 'POST'))
@@ -143,29 +142,38 @@ def adminlogin():
         username = request.form['username']
         password = request.form['password']
 
+        # Check admin exists in database with 'username'
         admin = Admin.query.filter_by(username = username).first()
-        error = None
 
+        # if not found return to login
         if not admin:
             return render_template('auth/adminlogin.html', loginFailed=True)
 
         if check_password_hash(admin.password, password):
             session["admin_username"] = username
             return redirect(url_for('auth.ban'))
-
+            
         return render_template('auth/admin.html', loginFailed = True)
 
     return render_template('auth/adminlogin.html')
 
+#
+#Admin ban page
+#
 
 @auth.route('/admin', methods = ('GET','POST'))
 def ban():
-    if not ('admin_username' in session): #If not logged in, send to login page
+    if not ('admin_username' in session): #If not logged in, send to admin login page
         return make_response(redirect(url_for('auth.adminlogin')))
             
+    # When page is rendered get a list of all reported users
     if request.method == 'GET':
         users = Report.query.order_by(Report.report_id).all()
         return render_template('auth/admin.html', users=users)
+    
+    # When the admin submits a username for ban
+    # check if username is a user and set ban_status to 1
+    # if the username is incorrect, alert the admin
     if request.method == 'POST':
         username = request.form['username']
         user = User.query.filter_by(username = username).first()
@@ -177,41 +185,7 @@ def ban():
             flash(alert)
     return redirect(url_for('auth.ban'))
 
-
-#
-# Before anything else is run this will run and check
-# if the user is logged in
-#
-@auth.before_app_request
-def load_logged_in_user():
-    user_id = session.get('user_id')
-
-    if user_id is None:
-        g.user = None
-    else:
-        pass
-    # get user id from database
-
-
-
-
-
 @auth.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
-
-
-#
-# This may or may not be used in the future to wrap veiws that
-# require a user to be logged in
-#
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-
-        return view(**kwargs)
-
-    return wrapped_view
