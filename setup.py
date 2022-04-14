@@ -13,6 +13,8 @@ setup(
         'flask', 
         'flask_sqlalchemy',
         'python-dotenv',
-        'password_validation'
+        'password_validation',
+        'requests',
+        'flask_socketio'
     ],
 )
