@@ -153,7 +153,7 @@ def adminlogin():
             session["admin_username"] = username
             return redirect(url_for('auth.ban'))
 
-        return render_template('auth/admin.html', loginFailed = True)
+        return render_template('auth/adminlogin.html', loginFailed = True)
 
     return render_template('auth/adminlogin.html')
 
@@ -162,7 +162,7 @@ def adminlogin():
 def ban():
     if not ('admin_username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.adminlogin')))
-            
+
     if request.method == 'GET':
         users = Report.query.order_by(Report.report_id).all()
         return render_template('auth/admin.html', users=users)
