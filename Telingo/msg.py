@@ -159,7 +159,7 @@ def msgChannel():
 
     elif request.method == 'POST':
         print('We got a Post Method')
-        if(request.form['ReportUser'] != 0):
+        if(int(request.form['ReportUser']) != 0):
             #Add report to database
             reportGet = Report.query.order_by(-Report.report_id).first()
             reportID = 0
