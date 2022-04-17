@@ -57,8 +57,9 @@ def landing():
                 for room in rooms:
                     # Make this part of the query?
                     # Add searching for only your native speakers
-                    if((room.fluency + searchRange == fluency or room.fluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundRoom):
+                    if((room.receiverFluency + searchRange == fluency or room.receiverFluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundRoom):
                         room.initiator = session['username']
+                        room.initiatorFluency = fluency
                         database.session.commit()
                         session['roomId'] = room.roomId
                         foundRoom = True
@@ -69,9 +70,9 @@ def landing():
 
             # Error checking if the query is empty
             if not roomId:
-                uRoom = Room(roomId=0, language=language, fluency=fluency, receiver=session['username'], initiator=None)
+                uRoom = Room(roomId=0, language=language, receiverFluency=fluency, receiver=session['username'], initiator=None, initiatorFluency=None)
             else:
-                uRoom = Room(roomId=roomId.roomId + 1, language=language, fluency=fluency, receiver=session['username'], initiator=None)
+                uRoom = Room(roomId=roomId.roomId + 1, language=language, receiverFluency=fluency, receiver=session['username'], initiator=None, initiatorFluency=None)
 
             session['roomId'] = uRoom.roomId
 
@@ -142,9 +143,14 @@ def msgChannel():
         if(room.initiator==session['username']):
             target=room.receiver
             identity="true"
+            targetsFluency=room.receiverFluency
         else:
             target=room.initiator
             identity="false"
+            targetsFluency=room.initiatorFluency
+
+        # Get the other target's language proficiency to display to user
+
 
         #If flagged, delete | otherwise, set flag for other user to delete
         if room.already_deleted:
@@ -155,7 +161,7 @@ def msgChannel():
             database.session.commit()
 
         #Use saved data to render template
-        return render_template('messaging/message_channel.html', user=session['username'],target=target, language=language, user_room=user_room, identity=identity, top1=top1, top2=top2, top3=top3, top4=top4)
+        return render_template('messaging/message_channel.html', user=session['username'],target=target, targetsFluency=targetsFluency, language=language, user_room=user_room, identity=identity, top1=top1, top2=top2, top3=top3, top4=top4)
 
     elif request.method == 'POST':
         print('We got a Post Method')
