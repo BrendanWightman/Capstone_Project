@@ -50,4 +50,4 @@ def edit(username):
     elif request.method == 'GET':
         secondLanguage = Language.query.with_parent(user).first()
         return render_template('home/profile_edit.html',user=user, secondLanguage=secondLanguage)
-    return render_template('home/profile_edit.html',user=user) #Should be impossible to reach
+    return render_template('home/profile_edit.html',user=user)

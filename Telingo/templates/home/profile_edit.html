@@ -68,10 +68,12 @@
 	     </form>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    {% if secondLanguage %} <!-- Safety check just in case -->
     <script type="text/javascript">
         //Code to set default selected values for editing to prevent accidental saving
         document.querySelector('select#nlang').value = "{{user.native_lang}}";
         document.querySelector('select#elang').value = "{{secondLanguage.language}}";
         document.querySelector('select#langprof').value = "{{secondLanguage.fluency}}";
     </script>
+    {% endif %}
 {% endblock%}

@@ -17,7 +17,12 @@ def landing():
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
 
-    if request.method == 'POST':
+    if request.method == 'GET': #Get second language info for default form values
+        user = User.query.filter_by(username = session['username']).first()
+        secondLanguage = Language.query.with_parent(user).first()
+        return render_template('messaging/skillselect.html', secondLanguage=secondLanguage)
+
+    elif request.method == 'POST':
         #Pull language from form
         language = request.form['language']
 
