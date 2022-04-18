@@ -39,4 +39,11 @@
       </form>
     </div>
 </div>
+{% if secondLanguage %} <!-- Safety check just in case -->
+<script type="text/javascript">
+    //Code to set default selected values for forms
+    document.querySelector('select#language').value = "{{secondLanguage.language}}";
+    document.querySelector('select#skill').value = "{{secondLanguage.fluency}}";
+</script>
+{% endif %}
 {% endblock%}

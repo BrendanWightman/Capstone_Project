@@ -46,4 +46,8 @@ def edit(username):
         user.native_lang = new_native_lang
         database.session.commit()
         return render_template('home/profile.html',user=user)
+
+    elif request.method == 'GET':
+        secondLanguage = Language.query.with_parent(user).first()
+        return render_template('home/profile_edit.html',user=user, secondLanguage=secondLanguage)
     return render_template('home/profile_edit.html',user=user)

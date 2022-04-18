@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col" style="text-align: center;">
                 <p>Native Language:</p>
-            <select name="new_native_lang" class="form-select w-auto mx-auto" aria-label=".form-select-sm">
+            <select name="new_native_lang" id="nlang" class="form-select w-auto mx-auto" aria-label=".form-select-sm">
                 <option value="English">English</option>
                 <option value="Japanese">Japanese</option>
                 <option value="German">German</option>
@@ -36,7 +36,7 @@
         <div class="row" style="width:50%; text-align:center; margin:auto;">
           <p style="text-align: center;">Add / Update a Secondary Language:&nbsp;</p>
             <div class="col" style="text-align: center; right:0;">
-		        <select name="edit_language" class="form-select mx-auto text-center" aria-label=".form-select-sm">
+		        <select name="edit_language" id="elang" class="form-select mx-auto text-center" aria-label=".form-select-sm">
                 <option value="English">English</option>
                 <option value="Japanese">Japanese</option>
                 <option value="German">German</option>
@@ -45,7 +45,7 @@
             </select>
             </div>
             <div class="col" style="text-align: center; left:0">
-            <select name="language_proficiency" class="form-select mx-auto text-center" aria-label=".form-select-sm">
+            <select name="language_proficiency" id="langprof" class="form-select mx-auto text-center" aria-label=".form-select-sm">
               <option value=0>Level 0</option>
               <option value=1 selected>Level 1</option>
               <option value=2>Level 2</option>
@@ -68,4 +68,12 @@
 	     </form>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    {% if secondLanguage %} <!-- Safety check just in case -->
+    <script type="text/javascript">
+        //Code to set default selected values for editing to prevent accidental saving
+        document.querySelector('select#nlang').value = "{{user.native_lang}}";
+        document.querySelector('select#elang').value = "{{secondLanguage.language}}";
+        document.querySelector('select#langprof').value = "{{secondLanguage.fluency}}";
+    </script>
+    {% endif %}
 {% endblock%}
