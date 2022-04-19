@@ -48,23 +48,40 @@ def landing():
         # else create room
 
         searchRange = 0
-        foundRoom = False
-
+        potentialRoom = None
+        foundExactMatch = False
 
         if(rooms is not None):
-            while (not foundRoom and searchRange < 6): #change number if fluency range smaller
-                #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
-                for room in rooms:
-                    # Make this part of the query?
-                    # Add searching for only your native speakers
-                    if((room.fluency + searchRange == fluency or room.fluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundRoom):
-                        room.initiator = session['username']
-                        database.session.commit()
-                        session['roomId'] = room.roomId
-                        foundRoom = True
-                searchRange += 1
+            if(fluency < 4):
+                while (not foundExactMatch and searchRange < 6): #change number if fluency range changes
+                    #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
+                    for room in rooms:
+                        if((room.fluency + searchRange == fluency or room.fluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundExactMatch):
+                            if User.query.filter(User.username == room.receiver).first().native_lang == user.native_lang:
+                                potentialRoom = room
+                                foundExactMatch = True
+                            else:
+                                potentialRoom = room
+                    searchRange += 1
+            else:
+                while (not potentialRoom and searchRange < 3): #change number if fluency range changes
+                    #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
+                    for room in rooms:
+                        if((room.fluency + searchRange == fluency or room.fluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundExactMatch):
+                            if User.query.filter(User.username == room.receiver).first().native_lang == user.native_lang:
+                                potentialRoom = room
+                                foundExactMatch = True
+                            else:
+                                potentialRoom = room
+                    searchRange += 1
 
-        if(not foundRoom):
+            potentialRoom.initiator = session['username']
+            database.session.commit()
+            session['roomId'] = potentialRoom.roomId
+
+
+
+        if(not foundExactMatch):
             roomId = Room.query.order_by(-Room.roomId).first()
 
             # Error checking if the query is empty
