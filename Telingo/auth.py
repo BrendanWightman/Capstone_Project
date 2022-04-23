@@ -35,17 +35,17 @@ def register():
         elif not new_password:
             error = 'Password is required.'
 
-        elif not policy.validate(new_password):   #policy is 8 characters with at least 1 number. edited in policy.py.
-            for requirement in policy.test_password(new_password):
-                alert = f"{requirement.name} not satisfied: expected: {requirement.requirement}, got: {requirement.actual}"
-                flash(alert)
-                return redirect(url_for('auth.register'))
-
-
             #if username already exists in database
         if database.session.query(database.exists().where(User.username == new_username)).scalar():
-            error = 'Username already exists.'
-            return redirect(url_for('auth.login'))
+            flash("User already exists", 'error')
+            return redirect(url_for('auth.register'))
+
+        elif not policy.validate(new_password):   #policy is 8 characters with at least 1 number. edited in policy.py.
+            for requirement in policy.test_password(new_password):
+                alert = f"{requirement.name} was not satisfied, expected: {requirement.requirement} | got: {requirement.actual}"
+                flash(alert, 'error')
+                return redirect(url_for('auth.register'))
+
 
         if error is None:
             # ToDo:
@@ -107,13 +107,14 @@ def login():
         # Check username is in the databse
         # if not set error = "Incorrect Username or Password"
         if not user:
+            flash('User does not exist', 'error')
             return render_template('/auth/login.html', loginFailed = True)
 
         # Check ban status of user
         user = User.query.filter_by(username = username).first()
         if(user.ban_status != 0):
             alert = 'Your account has been disabled.'
-            flash(alert)
+            flash(alert, 'error')
             return redirect(url_for('auth.login'))
 
         # Check hashed password to matching username
@@ -122,6 +123,7 @@ def login():
             session["username"] = username
             return redirect(url_for('home.index'))
 
+        flash('Incorrect Username or Password', 'error')
         return render_template('/auth/login.html', loginFailed = True)
 
     return render_template('/auth/login.html')
@@ -147,12 +149,14 @@ def adminlogin():
         error = None
 
         if not admin:
+            flash('Incorrect Username or Password', 'error')
             return render_template('auth/adminlogin.html', loginFailed=True)
 
         if check_password_hash(admin.password, password):
             session["admin_username"] = username
             return redirect(url_for('auth.ban'))
 
+        flash('Incorrect Username or Password', 'error')
         return render_template('auth/adminlogin.html', loginFailed = True)
 
     return render_template('auth/adminlogin.html')
@@ -172,9 +176,10 @@ def ban():
         if user is not None:
             user.ban_status = 1
             database.session.commit()
+            flash('User Banned Successfully', 'success')
         else:
             alert = 'User Does Not Exist'
-            flash(alert)
+            flash(alert, 'error')
     return redirect(url_for('auth.ban'))
 
 

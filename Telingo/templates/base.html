@@ -34,9 +34,19 @@
         </nav>
 
     <!-- Put this somewhere and make it look nice for error handling -->
-    {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
-    {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        {% if (category == 'error') %}
+          <hr/>
+          <div class="{{ category }} text-center">Error: {{ message }}</div>
+          <hr/>
+        {% else %}
+          <hr/>
+          <div class="{{ category }} text-center">{{ message }}</div>
+          <hr/>
+        {% endif %}
+      {% endfor %}
+    {% endwith %}
 
     {%block content%}
     {%endblock%}

@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, render_template, url_for, session, request, make_response, redirect
+    Blueprint, render_template, url_for, session, request, make_response, redirect, flash
 )
 
 from Telingo.auth import login_required
@@ -27,6 +27,7 @@ def edit(username):
         return make_response(redirect(url_for('auth.login')))
 
     if username != session['username']: #Prevent editing someone elses profile
+        flash('Editing Other Users\' profiles is not allowed', 'error')
         return make_response(redirect(url_for('home.profile', username=username)))
 
     user = User.query.filter_by(username = username).first()
