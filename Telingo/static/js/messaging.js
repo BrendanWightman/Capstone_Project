@@ -249,6 +249,7 @@ function closeCall(){
   leaveButton.disabled=true;
   remoteConnection.close();
   if(iceClose){ //If closed from ice, we don't want to show option to Report
+    alert("An error occured when trying to connect to the other user");
     window.location.replace("./msg");
   }
   else{
