@@ -15,8 +15,6 @@
             <div class="container"><a class="navbar-brand" href="{{url_for('home.index')}}">Telingo</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navcol-1">
                     <ul class="navbar-nav me-auto">
-                        <!-- set correct active status with nav_item -->
-                        <li class="nav-item"><a class="nav-link {% block nav_item_home %}{% endblock %}" href="{{url_for('home.index')}}">Home</a></li>
                         {% if session['username'] %}
                           <li class="nav-item"><a class="nav-link {% block nav_item_two %}{% endblock %}" href="{{url_for('msg.landing')}}">Connect</a></li>
                         {% endif %}
