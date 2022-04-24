@@ -28,7 +28,6 @@ def landing():
 
         #get user from table + reset roomId
         user = User.query.filter_by(username=session['username']).first()
-        session['roomId'] = None
 
         #If the user's language is declared, use their proficiency; otherwise use the one from the form
         uLanguage = Language.query.with_parent(user).filter(Language.language == language).first()
