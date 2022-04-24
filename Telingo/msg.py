@@ -68,6 +68,7 @@ def landing():
                         database.session.commit()
                         session['roomId'] = room.roomId
                         foundRoom = True
+                #time.sleep(2)
                 searchRange += 1
 
         if(not foundRoom):
@@ -87,10 +88,6 @@ def landing():
         #Cookie to store information about connection
         # Might not need this anymore
         res = make_response(redirect(url_for('msg.msgHolding')))
-        if(foundRoom):
-            res.set_cookie(key="channel_info", value=session['username']+":"+"initiator")
-        else:
-            res.set_cookie(key="channel_info", value=session['username']+":"+"receiver")
         return res #Redirect user to their conversation channel
     return render_template('messaging/skillselect.html')
 
@@ -116,10 +113,8 @@ def msgChannel():
         return make_response(redirect(url_for('auth.login')))
 
     if request.method == 'GET':
-        #Handle Cookies:
-        info = request.cookies.get('channel_info')
-        if not info:
-            #Add error message popup?
+        #Safety check to prevent direct URL access
+        if not ('roomId' in session):
             return redirect(url_for('msg.landing'))
 
         #Generate topic suggestions based on random number
@@ -164,7 +159,7 @@ def msgChannel():
         else:
             room.already_deleted = True
             database.session.commit()
-
+        del session['roomId']
         #Use saved data to render template
         return render_template('messaging/message_channel.html', user=session['username'],target=target, targetsFluency=targetsFluency, language=language, user_room=user_room, identity=identity, top1=top1, top2=top2, top3=top3, top4=top4)
 
