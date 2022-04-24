@@ -39,53 +39,11 @@ def landing():
         #Debug Print
         print("Matching a user in " + language + " with skill level: " + str(fluency))
 
+        # Save info in session to use on next page
+        session['desiredLanguage'] = language
+        session['desiredFluency'] = fluency
+        session['isQueued'] = True
 
-        # Check to see if user is already in a room
-        checkRoom = Room.query.filter((Room.initiator == user.username) | (Room.receiver == user.username)).first()
-        if(checkRoom is not None):
-            database.session.delete(checkRoom)
-            database.session.commit()
-
-        rooms = Room.query.filter(Room.language == language).all()
-
-        # if room exists that is same language, join room
-        # else create room
-
-        searchRange = 0
-        foundRoom = False
-
-
-        if(rooms is not None):
-            while (not foundRoom and searchRange < 6): #change number if fluency range smaller
-                #print("Searching on range " + str(fluency - searchRange) + " : " + str(fluency + searchRange))
-                for room in rooms:
-                    # Make this part of the query?
-                    # Add searching for only your native speakers
-                    if((room.receiverFluency + searchRange == fluency or room.receiverFluency - searchRange == fluency) and room.language == language and room.initiator == None and not foundRoom):
-                        room.initiator = session['username']
-                        room.initiatorFluency = fluency
-                        database.session.commit()
-                        session['roomId'] = room.roomId
-                        foundRoom = True
-                #time.sleep(2)
-                searchRange += 1
-
-        if(not foundRoom):
-            roomId = Room.query.order_by(-Room.roomId).first()
-
-            # Error checking if the query is empty
-            if not roomId:
-                uRoom = Room(roomId=0, language=language, receiverFluency=fluency, receiver=session['username'], initiator=None, initiatorFluency=None)
-            else:
-                uRoom = Room(roomId=roomId.roomId + 1, language=language, receiverFluency=fluency, receiver=session['username'], initiator=None, initiatorFluency=None)
-
-            session['roomId'] = uRoom.roomId
-
-            database.session.add(uRoom)
-            database.session.commit()
-
-        #Cookie to store information about connection
-        # Might not need this anymore
         res = make_response(redirect(url_for('msg.msgHolding')))
         return res #Redirect user to their conversation channel
     return render_template('messaging/skillselect.html')
@@ -97,12 +55,17 @@ def msgHolding():
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
 
-    #load room info and send to corresponding page
-    room = Room.query.filter(((Room.initiator==session['username']) | (Room.receiver==session['username']))).first()
-    if(room.initiator==session['username']):
-        return render_template('messaging/middleman.html', user=session['username'],target=room.receiver, user_room=room.roomId, identity="true")
-    else:
-        return render_template('messaging/middleman.html', user=session['username'],target=room.initiator, user_room=room.roomId, identity="false")
+    #If we did not come from landing page, redirect
+    if not ('desiredLanguage' in session) or not ('desiredFluency' in session):
+        return make_response(redirect(url_for('msg.landing')))
+
+    #Load call information then delete from session
+    language = session['desiredLanguage']
+    del session['desiredLanguage']
+    fluency = session['desiredFluency']
+    del session['desiredFluency']
+
+    return render_template('messaging/middleman.html', language=language, fluency=fluency)
 
 
 #Route for actual communication between users
@@ -111,10 +74,11 @@ def msgChannel():
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
 
+    print(session)
     if request.method == 'GET':
         #Safety check to prevent direct URL access
-        if not ('roomId' in session):
-            return redirect(url_for('msg.landing'))
+        if not ('isQueued' in session):
+            return make_response(redirect(url_for('msg.landing')))
 
         #Generate topic suggestions based on random number
         rand = random.randint(0, (len(topics)/4)-1) * 4
@@ -158,7 +122,7 @@ def msgChannel():
         else:
             room.already_deleted = True
             database.session.commit()
-        del session['roomId']
+        del session['isQueued']
         #Use saved data to render template
         return render_template('messaging/message_channel.html', user=session['username'],target=target, targetsFluency=targetsFluency, language=language, user_room=user_room, identity=identity, top1=top1, top2=top2, top3=top3, top4=top4)
 

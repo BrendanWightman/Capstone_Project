@@ -3,12 +3,12 @@
 <!--Setup (Socketio, adapter, and variables) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script type="text/javascript" charset="utf-8">
-  // Set up variables based on sent parameters
-    var username = "{{user}}"
-    var target = "{{target}}"
-    var room_ID = "{{user_room}}"
-    var initiator = {{identity}} //True = Initiator, False = Reciever
+  // Set up variables
+    var room_ID = null;
+    var language = "{{language}}";
+    var fluency = {{fluency}};
     var socket = io();
+    var connectedCount = 0;
 </script>
 
 
@@ -25,13 +25,16 @@
 
 
 <!--Javascript Functionality (ORDER MATTERS)-->
-<script type="text/javascript" src="../../static/js/messaging.js"></script>
 <script type="text/javascript" charset="utf-8">
-// Socket Listeners (Maybe move into JS file?)
+// Socket Listeners
   socket.on('connect', function() {
-      socket.emit('registerExistence');
-      socket.emit('joinCallRoom', {room: (room_ID), initiator: (initiator)});
-       // Change conditions required for this to happen, likely through some kind of join-room event listener
+      socket.emit('beginMatch', {language: (language), fluency: (fluency)});
+  });
+
+  socket.on('finishedMatching', function(data){
+    room_ID = data['roomId'];
+    socket.emit('registerExistence');
+    socket.emit('joinCallRoom', {room: (room_ID)});
   });
 
  // Listeners to ensure connection sequence does not start until both on webpage
@@ -47,15 +50,15 @@
   });
 
 
-// Other listeners:
-socket.on('transferPage', (dest) =>{
-  socket.emit("cleanExistence");
-  window.setTimeout(leavePage, 5000, dest); //Delay five seconds to avoid race condition possibility
-});
+  // Other listeners:
+  socket.on('transferPage', (dest) =>{
+    socket.emit("cleanExistence");
+    window.setTimeout(leavePage, 5000, dest); //Delay five seconds to avoid race condition possibility
+  });
 
-function leavePage(dest){ //Redirect
-  window.location.replace(dest);
-}
+  function leavePage(dest){ //Redirect
+    window.location.replace(dest);
+  }
 </script>
 </body>
 {% endblock%}
