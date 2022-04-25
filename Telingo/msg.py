@@ -74,7 +74,6 @@ def msgChannel():
     if not ('username' in session): #If not logged in, send to login page
         return make_response(redirect(url_for('auth.login')))
 
-    print(session)
     if request.method == 'GET':
         #Safety check to prevent direct URL access
         if not ('isQueued' in session):

@@ -62,7 +62,6 @@ def matchUsers(data):
                     database.session.commit()
                     roomId = room.roomId
                     foundRoom = True
-            socketio.sleep(2)
             searchRange += 1
 
     if(not foundRoom):
